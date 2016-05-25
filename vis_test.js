@@ -27,3 +27,24 @@ var options = {};
 
 // initialize your network!
 var network = new vis.Network(container, data, options);
+
+console.log(network)
+
+var delete_edge = function(edge) {
+	// edge in form {from: (int), to: (int)}
+	
+	//console.log(edges)
+	//edges = edges.remove(edge)
+	//console.log(edges)
+	//data = {nodes: nodes, edges: edges}
+	//network.setData(data)
+	
+	console.log(network.body.data.edges)
+	console.log(network.body.data.edges.remove(edge))
+	console.log(network.body.data.edges)
+	
+	network.body.data.edges = network.body.data.edges.remove(edge)
+	network.redraw()
+}
+
+delete_edge({from: 2, to: 5})
