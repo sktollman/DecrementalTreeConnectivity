@@ -25,3 +25,13 @@ var SuperNaive = function(graph) {
 	//O(1)
 	this.deleteEdge = function(vert1, vert2) {};
 };
+
+
+var container = document.getElementById('network');
+var g = new Graph(container)
+g.draw()
+g.addNode(17, 'yeah')
+
+
+
+
