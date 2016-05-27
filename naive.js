@@ -4,17 +4,17 @@ var Naive = function(graph) {
 	//O(n)
 	this.preprocess = function() {
 		this.clusterNums = 1;
-		this.connMap = {};
+		this.connectivityMap = {};
 		for(var start in this.graph.getVertices()) {
 			//if this vertex has already been assigned a cluster, skip it
-			if(start in this.connMap) continue;
+			if(start in this.connectivityMap) continue;
 			//DFS from this node, assigning them all the same cluster number
 			var stack = [start];
 			while(stack.length > 0){
 				var curr = stack.pop();
-				this.connMap[curr] = this.clusterNums;
+				this.connectivityMap[curr] = this.clusterNums;
 				for(var neighbor in this.graph.getNeighbors(curr)){
-					if(neighbor in this.connMap) continue;
+					if(neighbor in this.connectivityMap) continue;
 					stack.push(neighbor);
 				}
 			}
@@ -27,7 +27,7 @@ var Naive = function(graph) {
 	//O(1)
 	this.query = function(vert1, vert2) {
 		//checks to see if the two vertices map to the same cluster
-		return (this.connMap[vert1] === this.connMap[vert2]);
+		return (this.connectivityMap[vert1] === this.connectivityMap[vert2]);
 	};
 
 	//O(n)
@@ -42,9 +42,9 @@ var Naive = function(graph) {
 		while(stack.length > 0){
 			var curr = stack.pop();
 			comp.push(curr);
-			this.connMap[curr] = -1;
+			this.connectivityMap[curr] = -1;
 			for(var neighbor in this.graph.getNeighbors(curr)){
-				if(this.connMap[neighbor] == -1) continue;
+				if(this.connectivityMap[neighbor] == -1) continue;
 				stack.push(neighbor);
 			}
 		}
@@ -53,7 +53,7 @@ var Naive = function(graph) {
 		this.clusterNums++;
 		//assign all the things in vert1's cluster the new number
 		for(var vert in comp){
-			this.connMap[vert] = this.clusterNums;
+			this.connectivityMap[vert] = this.clusterNums;
 		}
 	};
 };

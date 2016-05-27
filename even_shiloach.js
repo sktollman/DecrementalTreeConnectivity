@@ -4,17 +4,17 @@ var EvenShiloach = function(graph) {
 	//O(n)
 	this.preprocess = function() {
 		this.clusterNums = 1;
-		this.connMap = {};
+		this.connectivityMap = {};
 		for(var start in this.graph.getVertices()) {
 			//if this vertex has already been assigned a cluster, skip it
-			if(start in this.connMap) continue;
+			if(start in this.connectivityMap) continue;
 			//DFS from this node, assigning them all the same cluster number
 			var stack = [start];
 			while(stack.length > 0){
 				var curr = stack.pop();
-				this.connMap[curr] = this.clusterNums;
+				this.connectivityMap[curr] = this.clusterNums;
 				for(var neighbor in this.graph.getNeighbors(curr)){
-					if(neighbor in this.connMap) continue;
+					if(neighbor in this.connectivityMap) continue;
 					stack.push(neighbor);
 				}
 			}
@@ -27,7 +27,7 @@ var EvenShiloach = function(graph) {
 	//O(1)
 	this.query = function(vert1, vert2) {
 		//checks to see if the two vertices map to the same cluster
-		return (this.connMap[vert1] === this.connMap[vert2]);
+		return (this.connectivityMap[vert1] === this.connectivityMap[vert2]);
 	};
 
 	//O(log(n))
@@ -35,7 +35,7 @@ var EvenShiloach = function(graph) {
 		//if there is no edge between them, quite
 		if(!this.query(vert1, vert2)) return;
 
-		var oldCluNum = this.connMap[vert1];
+		var oldCluNum = this.connectivityMap[vert1];
 		//save the list of the two components
 		var comp1 = [vert1];
 		var comp2 = [vert2];
@@ -48,15 +48,15 @@ var EvenShiloach = function(graph) {
 			//add these nodes to the component lists, mark them as searched
 			comp1.push(curr1);
 			comp2.push(curr2);
-			this.connMap[curr1] = -1;
-			this.connMap[curr2] = -1;
+			this.connectivityMap[curr1] = -1;
+			this.connectivityMap[curr2] = -1;
 			//add unsearched neighbors
 			for(var neighbor in this.graph.getNeighbors(curr1)){
-				if(this.connMap[neighbor] == -1) continue;
+				if(this.connectivityMap[neighbor] == -1) continue;
 				stack1.push(neighbor);
 			}
 			for(var neighbor in this.graph.getNeighbors(curr2)){
-				if(this.connMap[neighbor] == -1) continue;
+				if(this.connectivityMap[neighbor] == -1) continue;
 				stack2.push(neighbor);
 			}
 		}
@@ -72,10 +72,10 @@ var EvenShiloach = function(graph) {
 		}
 		//assign all the things in the small one to the new number and the other one the old number
 		for(var vert in comp){
-			this.connMap[vert] = this.clusterNums;
+			this.connectivityMap[vert] = this.clusterNums;
 		}
 		for(var vert in compOther){
-			this.connMap[vert] = oldCluNum;
+			this.connectivityMap[vert] = oldCluNum;
 		}
 	};
 };
