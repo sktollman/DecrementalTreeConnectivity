@@ -1,39 +1,56 @@
 var EvenShiloach = function(graph) {
 	this.graph = graph;
-	
+	this.animationQueue = new Array();
+
 	//O(n)
 	this.preprocess = function() {
 		this.clusterNums = 1;
 		this.connectivityMap = {};
-		for(var start in this.graph.getVertices()) {
+		var vertices = this.graph.getVertices();
+		for (var i in vertices) {
+			var start = vertices[i].id
 			//if this vertex has already been assigned a cluster, skip it
-			if(start in this.connectivityMap) continue;
+			if (start in this.connectivityMap) continue;
 			//DFS from this node, assigning them all the same cluster number
 			var stack = [start];
-			while(stack.length > 0){
+			while (stack.length > 0){
 				var curr = stack.pop();
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
 				this.connectivityMap[curr] = this.clusterNums;
-				for(var neighbor in this.graph.getNeighbors(curr)){
-					if(neighbor in this.connectivityMap) continue;
-					stack.push(neighbor);
+				
+				var neighbors = this.graph.getNeighbors(curr);
+				for(var n in neighbors){
+					if(neighbors[n] in this.connectivityMap) continue;
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [neighbors[n], '#ffff00', '#ffd700']}); // yellow
+					stack.push(neighbors[n]);
 				}
+
+				this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [curr, this.clusterNums]}); // put in correct group
 			}
+				
 			this.clusterNums++;
 		}
 		this.clusterNums--;
 	};
-	this.preprocess();
 
 	//O(1)
 	this.query = function(vert1, vert2) {
-		//checks to see if the two vertices map to the same cluster
-		return (this.connectivityMap[vert1] === this.connectivityMap[vert2]);
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#e60000', '#990000']}); // red
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#e60000', '#990000']}); // red
+		if (this.connectivityMap[vert1] === this.connectivityMap[vert2]) {
+			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#00FF00', '#32CD32']}); // green
+			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#00FF00', '#32CD32']}); // green
+			return true;
+		}
+		return false;
 	};
 
 	//O(log(n))
 	this.deleteEdge = function(vert1, vert2) {
-		//if there is no edge between them, quite
-		if(!this.query(vert1, vert2)) return;
+        this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+        this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
+        this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
 		var oldCluNum = this.connectivityMap[vert1];
 		//save the list of the two components
@@ -45,19 +62,28 @@ var EvenShiloach = function(graph) {
 		while(stack1.length > 0 && stack2.length > 0){
 			var curr1 = stack1.pop();
 			var curr2 = stack2.pop();
+			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr1, '#e60000', '#990000']}); // red
+			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr2, '#e60000', '#990000']}); // red
+					
 			//add these nodes to the component lists, mark them as searched
 			comp1.push(curr1);
 			comp2.push(curr2);
 			this.connectivityMap[curr1] = -1;
 			this.connectivityMap[curr2] = -1;
 			//add unsearched neighbors
-			for(var neighbor in this.graph.getNeighbors(curr1)){
-				if(this.connectivityMap[neighbor] == -1) continue;
-				stack1.push(neighbor);
+			var neighbors1 = this.graph.getNeighbors(curr1)
+			for(var n in neighbors1){
+				if(this.connectivityMap[neighbors1[n]] == -1 || neighbors1[n] == vert2) continue;
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [neighbors1[n], '#ffff00', '#ffd700']}); // yellow
+					
+				stack1.push(neighbors1[n]);
 			}
-			for(var neighbor in this.graph.getNeighbors(curr2)){
-				if(this.connectivityMap[neighbor] == -1) continue;
-				stack2.push(neighbor);
+			var neighbors2 = this.graph.getNeighbors(curr2)
+			for(var n in neighbors2){
+				if(this.connectivityMap[neighbors2[n]] == -1 || neighbors2[n] == vert1) continue;
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [neighbors2[n], '#ffff00', '#ffd700']}); // yellow
+					
+				stack2.push(neighbors2[n]);
 			}
 		}
 
@@ -72,10 +98,15 @@ var EvenShiloach = function(graph) {
 		}
 		//assign all the things in the small one to the new number and the other one the old number
 		for(var vert in comp){
-			this.connectivityMap[vert] = this.clusterNums;
+			this.connectivityMap[comp[vert]] = this.clusterNums;
+			this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [comp[vert], this.clusterNums]}); 
+		
 		}
 		for(var vert in compOther){
-			this.connectivityMap[vert] = oldCluNum;
+			this.connectivityMap[comp[vert]] = oldCluNum;
+			this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [compOther[vert], oldCluNum]}); 
 		}
+
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
 	};
 };

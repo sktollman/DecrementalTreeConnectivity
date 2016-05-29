@@ -2,114 +2,242 @@
  * Creates a graph object which allows you to dynamically update
  * and access nodes and edges
  */
-var Graph = function(container) {
-	var nodes, edges, network;
+
+var Graph = function(container, nodes_param, edges_param) {
+	// default values
+	if (nodes_param == undefined) nodes_param = [
+			{id: '1', label: '1'},
+			{id: '2', label: '2'},
+			{id: '3', label: '3'},
+			{id: '4', label: '4'},
+			{id: '5', label: '5'}
+			];
+	if (edges_param == undefined) edges_param = [
+				{id: '1', from: '1', to: '2'},
+				{id: '2', from: '1', to: '3'},
+				{id: '3', from: '2', to: '4'},
+				{id: '4', from: '2', to: '5'}
+				];
+
+	this.network = {};
+	this.container = container;
+	this.edges = new vis.DataSet(edges_param);
+	this.nodes = new vis.DataSet(nodes_param);
+
+	this.neighbors = {};
+	for (var n in nodes_param) {
+		this.neighbors[nodes_param[n].id] = new Array();
+	}
+	for (var e in edges_param) {
+		this.neighbors[edges_param[e].from].push(edges_param[e].to);
+	}
+
+	this.edgeToId = {};
+	for (var e in edges_param) {
+		var edge = edges_param[e];
+		var fromTo = edge.from + edge.to;
+		this.edgeToId[fromTo] = edge.id;
+	}
+
+	this.getNeighbors = function(id) {
+		return this.neighbors[id];
+	}
 
 	this.addNode = function(id, label) {
-		try {
-			nodes.add({
-				id: id,
-				label: label
-			});
-		}
-		catch (err) {
-			alert(err);
-		}
+		this.nodes.add({
+			id: id,
+			label: label
+		});
 	};
 
-	this.updateNode = function(id, label) {
-		try {
-			nodes.update({
-				id: id,
-				label: label
+	this.updateNodeGroup = function(id, groupNum) {
+		this.nodes.update({
+			id: id, 
+			group: groupNum
+		});
+	}
+
+	this.highlightNode = function(id, backgroundColor, borderColor) {
+		this.nodes.update({
+			id: id, 
+			color: {
+				background: backgroundColor,
+				border: borderColor
+			}
+		});
+	}
+
+	this.unhighlightNode = function(id) {
+		this.nodes.update({
+			id: id,
+			color: null
+		});
+	}
+
+	this.unhighlightAll = function() {
+		// later should update all edges too
+		items = this.nodes.get()
+		for (var i in items) {
+			this.nodes.update({
+				id: items[i].id,
+				group: items[i].group
 			});
 		}
-		catch (err) {
-			alert(err);
-		}
+	}
+
+	this.highlightEdge = function(from, to, c) {
+		var fromTo = from + to
+		var id = this.edgeToId[fromTo];
+		this.edges.update({
+			id: id, 
+			from: from,
+			to: to,
+			color: {
+				color: c
+			},
+			dashes: true
+		});
+	}
+
+	this.unhighlightEdge = function(to, from) {
+		var fromTo = from + to
+		var id = this.edgeToId[fromTo];
+		this.edges.update({
+			id: id,
+			from: from,
+			to: to,
+			color: null
+		});
+	}
+
+	this.getVertices = function() {
+		return this.nodes.get()
+	}
+
+	this.updateNode = function(id, label) {
+		this.nodes.update({
+			id: id,
+			label: label
+		});
 	}
 
 
 	this.removeNode = function(id) {
-		try {
-			nodes.remove({id: id});
-		}
-		catch (err) {
-			alert(err);
-		}
+		this.nodes.remove({id: id});
 	}
 
 
 	this.addEdge = function(id, from, to) {
-		try {
-			edges.add({
-				id: id,
-				from: from,
-				to: to
-			});
-		}
-		catch (err) {
-			alert(err);
-		}
+		this.edges.add({
+			id: id,
+			from: from,
+			to: to
+		});
 	}
 
 
 	this.updateEdge = function(id, from, to) {
-		try {
-			edges.update({
-				id: id,
-				from: from,
-				to: to
-			});
-		}
-		catch (err) {
-			alert(err);
-		}
+		this.edges.update({
+			id: id,
+			from: from,
+			to: to
+		});
 	}
 
 
-	this.removeEdge = function(id) {
-		try {
-			edges.remove({id: id});
-		}
-		catch (err) {
-			alert(err);
-		}
+	this.removeEdge = function(from, to) {
+		var fromTo = from + to;
+		this.edges.remove({id: this.edgeToId[fromTo]});
+		var index = this.neighbors[from].indexOf(to);
+		this.neighbors[from].splice(index, 1);
 	}
 
 	this.draw = function() {
-		// create an array with nodes
-		nodes = new vis.DataSet();
-		//nodes.on('*', function () {
-			//document.getElementById('nodes').innerHTML = toJSON(nodes.get())
-		//});
-		nodes.add([
-			{id: '1', label: 'Node 1'},
-			{id: '2', label: 'Node 2'},
-			{id: '3', label: 'Node 3'},
-			{id: '4', label: 'Node 4'},
-			{id: '5', label: 'Node 5'}
-		]);
-
-		// create an array with edges
-		edges = new vis.DataSet();
-		//edges.on('*', function () {
-			//document.getElementById('edges').innerHTML = toJSON(edges.get())
-		//});
-		edges.add([
-			{id: '1', from: '1', to: '2'},
-			{id: '2', from: '1', to: '3'},
-			{id: '3', from: '2', to: '4'},
-			{id: '4', from: '2', to: '5'}
-		]);
-
 		// create a network
 		var data = {
-			nodes: nodes,
-			edges: edges
+			nodes: this.nodes,
+			edges: this.edges
 		};
-		var options = {};
-		network = new vis.Network(container, data, options);
+		var options = { 
+			nodes: {
+		        shape: 'dot',
+		        size: 15,
+		        font: {
+		            size: 20,
+		            color: '#ffffff'
+		        },
+		        color: {
+		        	background: '#EEE9E9',
+		        	border: '#EEE9E9'
+		        },
+		        borderWidth: 2
+		    },
+		    edges: {
+		        width: 2,
+				arrows: 'to',
+				color: {
+					inherit: false
+				}
+			},
+			layout: {
+				hierarchical: {
+					enabled: true,
+					direction: 'UD',
+					sortMethod: 'directed',
+					levelSeparation: 100,
+					treeSpacing: 100
+				}
+			},
+			physics: {
+				enabled: false
+			},
+			groups: {
+				// what if the nodes could be default colored but insides are all same as background color? 
+				'1': {
+					color: {
+						background: '#EEE9E9',
+						border: '#FF1493'
+					}
+				},
+				'2': {
+					color: {
+						background: '#EEE9E9',
+						border: '#00BFFF'
+					}
+				},
+				'3': {
+					color: {
+						background: '#EEE9E9',
+						border: '#00EEEE'
+					}
+				},
+				'4': {
+					color: {
+						background: '#EEE9E9',
+						border: '#5CACEE'
+					}
+				},
+				'5': {
+					color: {
+						background: '#EEE9E9',
+						border: '#9ACD32'
+					}
+				},
+				'6': {
+					color: {
+						background: '#EEE9E9',
+						border: '#9B30FF'
+					}
+				},
+				'7': {
+					color: {
+						background: '#EEE9E9',
+						border: '#FA8072'
+					}
+				}
+			}
+		};
+		this.network = new vis.Network(this.container, data, options);
 	}
 };
 

@@ -5,13 +5,17 @@ var AlstrupSecherSpork = function(graph) {
 	this.clusters = [];
 	this.clusterMap = {};
 
+	this.animationQueue = new Array()
+
 	//for preprocessing
 	this.addCluster = function(cluster){
 		//update the variables to keep track of the cluster
-		for(var node in cluster.nodes){
-			this.clusterMap[node] = cluster;
+		var nodes = cluster.nodes
+		for(var n in nodes){
+			this.clusterMap[nodes[n]] = cluster;
+			// highlight nodes 
 		}
-		this.clusters.push[cluster];
+		this.clusters.push[cluster]; 
 	};
 	//recursively generate clusters as per Fredrickson
 	this.makeCluster = function(node) {
@@ -21,8 +25,9 @@ var AlstrupSecherSpork = function(graph) {
 		var neighbors = this.graph.getNeighbors(node);
 		var deg = length(neighbors);
 		var size = 1;
-		for(var neighbor in neighbors){
-			if(!neighbor in this.clusterMap) continue;
+		for(var n in neighbors){
+			var neighbor = neighbors[n]
+			if(!(neighbor in this.clusterMap)) continue;
 			var nborCluster = this.makeCluster(neighbor);
 			if(deg + nborCluster.degree - 2 <= 2 && sz + nborCluster.size <= this.logSize){
 				clus += nborCluster.nodes;
@@ -42,8 +47,8 @@ var AlstrupSecherSpork = function(graph) {
 		var verts = this.graph.getVertices();
 		var rt = null;
 		for(var vert in verts){
-			if(length(this.graph.getNeighbors(vert)) === 1){
-				rt = vert;
+			if(length(this.graph.getNeighbors(verts[vert])) === 1){
+				rt = verts[vert];
 				break;
 			}
 		}
@@ -51,12 +56,14 @@ var AlstrupSecherSpork = function(graph) {
 		this.addCluster(this.makeCluster(rt));
 
 		//add boundary node information
-		for(var clus in this.clusters){
+		for(var c in this.clusters){
+			var clus = this.clusters[c]
 			clus.boundaries = [];
 			for(var node in clus.nodes){
 				for(var nbor in this.graph.getNeighbors(node)){
 					if(this.clusterMap[nbor] !== clus){
 						clus.boundaries.push(node);
+						// make that node bigger
 						break;
 					}
 				}
@@ -66,12 +73,17 @@ var AlstrupSecherSpork = function(graph) {
 		//go through all the boundary nodes and check their connectivity
 		var macroNodes = [];
 		var macroEdges = [];
-		for(var clus in this.clusters){
-			for(var bound in clus.boundaries){
+		for(var c in this.clusters){
+			var clus = this.clusters[c]
+			for(var b in clus.boundaries){
+				var bound = clus.boundaries[b]
 				macroNodes.push(bound);
-				for(var nbor in this.graph.getNeighbors(bound)){
+				var neighbors = this.graph.getNeighbors(bound)
+				for(var n in neighbors){
+					var nbor = neighbors[n]
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
 						macroEdges.push([bound, nbor]);
+						// make this edge bigger
 					}
 				}
 			}
@@ -81,7 +93,8 @@ var AlstrupSecherSpork = function(graph) {
 		this.macroESRepr = new EvenShiloach(this.macroGraph);
 
 		//make micro representations for each cluster
-		for(var clus in this.clusters){
+		for(var c in this.clusters){
+			var clus = this.clusters[c]
 			//create pathwords that correspond to each of the nodes
 			clus.pathWords = {};
 			clus.pathWords[clus.boundaries[0]] = 0;
@@ -89,10 +102,14 @@ var AlstrupSecherSpork = function(graph) {
 			clus.microEdges = [];
 			var stack = [clus.boundaries[0]];
 			var searched = [];
+
+			// DFS COLORING
 			while(stack.length > 0){
 				var curr = stack.pop();
 				searched.push[curr];
-				for(var nbor in this.graph.getNeighbors(curr)){
+				var neighbors = this.graph.getNeighbors(curr)
+				for(var n in neighbors){
+					var nbor = neighbors[n]
 					if(nbor in searched || this.clusterMap[nbor] !== clus) continue;
 					//add edge to lists
 					stack.push(nbor);
@@ -107,7 +124,6 @@ var AlstrupSecherSpork = function(graph) {
 			clus.edgeWord = (1 << length(clus.microEdges)) - 1;
 		}
 	};
-	this.preprocess();
 
 	//query connectivity in the macro graph
 	this.macroquery = function(macVert1, macVert2){
@@ -121,29 +137,31 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(1)
 	this.query = function(vert1, vert2) {
+		// 
+
 		var clu1 = this.clusterMap[vert1];
 		var clu2 = this.clusterMap[vert2];
 		//if they're in the same cluster, just check the micro connectivity
-		if(clu1 === clu2){
+		if (clu1 === clu2) {
 			return this.microquery(vert1, vert2);
 		}
 		//otherwise, check the boundary nodes each inner vert can get to
 		var boundaries1 = [];
-		for(var vert in clu1.boundaries){
-			if(this.microquery(vert1, vert)){
+		for (var vert in clu1.boundaries) {
+			if (this.microquery(vert1, vert)) {
 				boundaries1.push(vert);
 			}
 		}
 		var boundaries2 = [];
-		for(var vert in clu2.boundaries){
-			if(this.microquery(vert2, vert)){
+		for (var vert in clu2.boundaries) {
+			if (this.microquery(vert2, vert)) {
 				boundaries1.push(vert);
 			}
 		}
 		//check the boundary nodes we found for macro connetivity
-		for(var macVert1 in boundaries1){
-			for(var macVert2 in boundaries2){
-				if(this.macroquery(macVert1, macVert2))
+		for (var macVert1 in boundaries1) {
+			for (var macVert2 in boundaries2) {
+				if (this.macroquery(macVert1, macVert2))
 					return true;
 			}
 		}
@@ -152,6 +170,11 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(1)
 	this.deleteEdge = function(vert1, vert2) {
+		// first remove. 
+		// use queue from macro es to color dfs over boundaries 
+		// print bit representations. 
+		// change bit representation
+
 		//if it's a macroedge, delete it in the macrograph
 		var outerVerts = this.macroGraph.getVertices();
 		if(vert1 in outerVerts && vert2 in outerVerts){
