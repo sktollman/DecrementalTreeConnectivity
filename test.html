@@ -3,6 +3,7 @@
 	<title>DCTs</title>
 	<script type="text/javascript" src="node_modules/vis/dist/vis.js"></script>
     <link href="node_modules/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+    <link href="test.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="graph.js"></script>
     <script type="text/javascript" src="super_naive.js"></script>
     <script type="text/javascript" src="naive.js"></script>
@@ -16,156 +17,104 @@
 	<body>
     <!--div style="float:left">
     <h1>Unstructured</h1-->
-	<div id="network_supernaive" style="float:left"></div>
-    <script type="text/javascript">
-        var container1 = document.getElementById('network_supernaive');
-        var g_supernaive = new Graph(container1);
-        g_supernaive.draw();
-        var sn = new SuperNaive(g_supernaive);
-    </script>
-    <div id="network_naive" style="float:left"></div>
-    <script type="text/javascript">
-        var container2 = document.getElementById('network_naive');
-        var g_naive = new Graph(container2);
-        g_naive.draw();
-        var naive = new Naive(g_naive);
-    </script>
-    <div id="network_es" style="float:left"></div>
-    <script type="text/javascript">
-        var container4 = document.getElementById('network_es');
-        var g_es = new Graph(container4);
-        g_es.draw();
-        var es = new EvenShiloach(g_es);
-    </script>
+	<table>
+		<tr>
+			<td>
+				<h1 class="title">Super Naive</h1>
+			</td>
+			<td>
+				<div id="network_supernaive" style="float:left"></div>
+				<script type="text/javascript">
+					var container1 = document.getElementById('network_supernaive');
+					var g_supernaive = new Graph(container1);
+					g_supernaive.draw();
+					var sn = new SuperNaive(g_supernaive);
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h1 class="title">Naive</h1>
+			</td>
+			<td>
+				<div id="network_naive" style="float:left"></div>
+				<script type="text/javascript">
+					var container2 = document.getElementById('network_naive');
+					var g_naive = new Graph(container2);
+					g_naive.draw();
+					var naive = new Naive(g_naive);
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h1 class="title">Even Shiloach</h1>
+			</td>
+			<td>
+				<div id="network_es" style="float:left"></div>
+				<script type="text/javascript">
+					var container4 = document.getElementById('network_es');
+					var g_es = new Graph(container4);
+					g_es.draw();
+					var es = new EvenShiloach(g_es);
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h1 class="title">Alstrup Secher Spork</h1>
+			</td>
+			<td>
+				<div id="network_spork" style="float:left"></div>
+				<script type="text/javascript">
+					// will be implemented
 
-    <div id="network_spork" style="float:left"></div>
-    <script type="text/javascript">
-        // will be implemented
+					// var container3 = document.getElementById('network_spork');
+					// var g_spork = new Graph(container3);
+					// g_spork.draw();
+					// var spork = new AlstrupSecherSpork(g_spork);
+				</script>
+			</td>
+		</tr>
+	</table>
 
-        // var container3 = document.getElementById('network_spork');
-        // var g_spork = new Graph(container3);
-        // g_spork.draw();
-        // var spork = new AlstrupSecherSpork(g_spork);
-    </script>
-
-    <div>
-    <table>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td></td>
-                    <td><label for="edge-from">From</label></td>
-                    <td><input id="edge-from" type="text" value="1"></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><label for="edge-to">To</label></td>
-                    <td><input id="edge-to" type="text" value="2"></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <button id="remove" onclick="deleteEdge();highlight();">Remove</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <button id="query" onclick="query();">Query</button>
-                        <td><label for="result">Result: </label></td>
-                        <script> 
-                        document.getElementById("query").disabled=true;
-                        document.getElementById("remove").disabled=true;
-                        var delay = 200 // make slider
-
-                        function query() {
-                            var vert1 = document.getElementById('edge-from').value
-                            var vert2 = document.getElementById('edge-to').value
-                            var result = sn.query(vert1, vert2);
-                            naive.query(vert1, vert2);
-                            es.query(vert1, vert2);
-                            //spork.query();
-                            
-                            console.log(result);
-                            document.getElementById('query-result').innerHTML = result;
-                            document.getElementById("query").disabled=true;
-                            document.getElementById("remove").disabled=true;
-                            highlight();
-                        }
-                        function preprocess() {
-                            naive.preprocess();
-                            es.preprocess();
-                            //spork.preprocess();
-                            document.getElementById("preprocess").disabled=true;
-                            highlight();
-                            
-                        }
-                        function deleteEdge() {
-                            var vert1 = document.getElementById('edge-from').value
-                            var vert2 = document.getElementById('edge-to').value
-                            sn.deleteEdge(vert1, vert2);
-                            naive.deleteEdge(vert1, vert2);
-                            es.deleteEdge(vert1, vert2);
-                            //spork.deleteEdge();
-                            document.getElementById("query").disabled=true;
-                            document.getElementById("remove").disabled=true;
-                            highlight();
-                        }
-                        function highlight() {
-                            if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && /*spork.animationQueue.length == 0 &&*/ es.animationQueue.length == 0) {
-                                document.getElementById("query").disabled=false;
-                                document.getElementById("remove").disabled=false;
-                                return;
-                            }
-                            
-                            if (sn.animationQueue.length > 0) {
-                                var action = sn.animationQueue[0]
-                                action.func.apply(action.that, action.args)
-                                sn.animationQueue.splice(0,1)
-                            }
-                            if (naive.animationQueue.length > 0) {
-                                var action = naive.animationQueue[0];
-                                action.func.apply(action.that, action.args);
-                                naive.animationQueue.splice(0,1);
-                        
-                            }
-                            
-                            // if (spork.animationQueue.length > 0) {
-                            //     var action = spork.animationQueue[0]
-                            //     action.func.apply(action.that, action.args)
-                            //     spork.animationQueue.splice(0,1)
-                            // }
-
-                            if (es.animationQueue.length > 0) {
-                                var action = es.animationQueue[0];
-                                action.func.apply(action.that, action.args);
-                                es.animationQueue.splice(0,1);
-                            }
-
-                            setTimeout(function() { highlight() }, delay)
-                            // allow the user to set the animation speed
-                        }
-                        </script>
-                        <td><label for="query-result" id="query-result">No queries yet!</label></td>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <!-- make this only enabled at the beginning, and disable others when it is enabled -->
-                        <button id="preprocess" onclick="preprocess();">Preprocess</button>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-</table>
+    <div class="controls">
+		<h2 class="control-title">Controls</h2>
+		<table class="control-table">
+			<tr>
+				<td class="control-cell"><label for="edge-from" class="fromto">From</label></td>
+				<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
+			</tr>
+			<tr>
+				<td class="control-cell"><label for="edge-to" class="fromto">To</label></td>
+				<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
+			</tr>
+			<tr>
+				<td class="control-cell"></td>
+				<td class="control-cell">
+					<button id="remove" class="control-button" onclick="deleteEdge();highlight();">Remove</button>
+				</td>
+			</tr>
+			<tr>
+				<td class="control-cell"></td>
+				<td class="control-cell">
+					<button id="query" class="control-button" onclick="query();">Query</button>
+				</td>
+			</tr>
+			<tr>
+				<td class="control-cell"></td>
+				<td class="control-cell">
+					<!-- make this only enabled at the beginning, and disable others when it is enabled -->
+					<button id="preprocess" class="control-button" onclick="preprocess();">Preprocess</button>
+				</td>
+			</tr>
+			<tr>
+				<td class="control-cell"><label class="fromto" for="result">Result: </label></td>
+				<td class="control-cell"><label class="result" for="query-result" id="query-result">No queries yet!</label></td>
+			</tr>
+		</table>
     </div>
+	<script type="text/javascript" src="run.js"></script>
 
 	</body>
 </html>
