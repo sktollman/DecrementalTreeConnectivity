@@ -1,18 +1,22 @@
 .title {
 	text-align: center;
 	padding: 10px;
+	padding-bottom: 0px;
 }
 
 .sidebar {
 	position: fixed;
-	top: 10%;
-	right: 0%;
-	width: 250px;
+	bottom: 10%;
+	right: 50%;
+	width: 500px;
 	height: 500px;
 	background-color: white;
 }
 
 .controls {
+	padding: 10px;
+	position:fixed;
+	left:28%;
 	height: 280px;
 	width: 250px;
 
@@ -51,7 +55,11 @@
 }
 
 .key {
-	width: 250px
+	padding: 10px;
+	position: fixed;
+	right:30%;
+	height: 280px;
+	width: 250px;
 }
 
 .key-table {
@@ -69,5 +77,10 @@
 	width: 300px;
 	color: white;
 	padding: 0px 10px;
+}
+
+.network {
+	height: 40vh;
+	width: 400px;
 }
 
