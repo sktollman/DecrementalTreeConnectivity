@@ -103,7 +103,7 @@ var EvenShiloach = function(graph) {
 		
 		}
 		for(var vert in compOther){
-			this.connectivityMap[comp[vert]] = oldCluNum;
+			this.connectivityMap[compOther[vert]] = oldCluNum;
 			this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [compOther[vert], oldCluNum]}); 
 		}
 

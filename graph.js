@@ -78,10 +78,19 @@ var Graph = function(container, nodes_param, edges_param) {
 		// later should update all edges too
 		items = this.nodes.get()
 		for (var i in items) {
-			this.nodes.update({
-				id: items[i].id,
-				group: items[i].group
-			});
+			//console.log(items[i].group)
+			if (items[i].group) {
+				this.nodes.update({
+					id: items[i].id,
+					group: items[i].group
+				});
+			} else {
+				this.nodes.update({
+					id: items[i].id,
+					color: null
+				});
+			}
+			
 		}
 	}
 
