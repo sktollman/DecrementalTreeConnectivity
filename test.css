@@ -3,12 +3,19 @@
 	padding: 10px;
 }
 
-.controls {
+.sidebar {
 	position: fixed;
 	top: 10%;
 	right: 0%;
+	width: 250px;
+	height: 500px;
+	background-color: white;
+}
+
+.controls {
 	height: 280px;
 	width: 250px;
+
 }
 
 .control-table {
@@ -42,3 +49,25 @@
 	padding-left: 0px;
 	color: white;
 }
+
+.key {
+	width: 250px
+}
+
+.key-table {
+	padding: 10px;
+	padding-left: 25px;
+	padding-top: 0px;
+}
+
+.key-cell {
+	height: 30px;
+	width: 70px;
+}
+
+.key-description {
+	width: 300px;
+	color: white;
+	padding: 0px 10px;
+}
+

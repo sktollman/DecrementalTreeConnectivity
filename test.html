@@ -78,42 +78,65 @@
 		</tr>
 	</table>
 
-    <div class="controls">
-		<h2 class="control-title">Controls</h2>
-		<table class="control-table">
-			<tr>
-				<td class="control-cell"><label for="edge-from" class="fromto">From</label></td>
-				<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
-			</tr>
-			<tr>
-				<td class="control-cell"><label for="edge-to" class="fromto">To</label></td>
-				<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
-			</tr>
-			<tr>
-				<td class="control-cell"></td>
-				<td class="control-cell">
-					<button id="remove" class="control-button" onclick="deleteEdge();highlight();">Remove</button>
-				</td>
-			</tr>
-			<tr>
-				<td class="control-cell"></td>
-				<td class="control-cell">
-					<button id="query" class="control-button" onclick="query();">Query</button>
-				</td>
-			</tr>
-			<tr>
-				<td class="control-cell"></td>
-				<td class="control-cell">
-					<!-- make this only enabled at the beginning, and disable others when it is enabled -->
-					<button id="preprocess" class="control-button" onclick="preprocess();">Preprocess</button>
-				</td>
-			</tr>
-			<tr>
-				<td class="control-cell"><label class="fromto" for="result">Result: </label></td>
-				<td class="control-cell"><label class="result" for="query-result" id="query-result">No queries yet!</label></td>
-			</tr>
-		</table>
-    </div>
+	<div class="sidebar">
+		<div class="controls">
+			<h2 class="control-title">Controls</h2>
+			<table class="control-table">
+				<tr>
+					<td class="control-cell"><label for="edge-from" class="fromto">From</label></td>
+					<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
+				</tr>
+				<tr>
+					<td class="control-cell"><label for="edge-to" class="fromto">To</label></td>
+					<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
+				</tr>
+				<tr>
+					<td class="control-cell"></td>
+					<td class="control-cell">
+						<button id="remove" class="control-button" onclick="deleteEdge();highlight();">Remove</button>
+					</td>
+				</tr>
+				<tr>
+					<td class="control-cell"></td>
+					<td class="control-cell">
+						<button id="query" class="control-button" onclick="query();">Query</button>
+					</td>
+				</tr>
+				<tr>
+					<td class="control-cell"></td>
+					<td class="control-cell">
+						<!-- make this only enabled at the beginning, and disable others when it is enabled -->
+						<button id="preprocess" class="control-button" onclick="preprocess();">Preprocess</button>
+					</td>
+				</tr>
+				<tr>
+					<td class="control-cell"><label class="fromto" for="result">Result: </label></td>
+					<td class="control-cell"><label class="result" for="query-result" id="query-result">No queries yet!</label></td>
+				</tr>
+			</table>
+		</div>
+		<div class="key">
+			<h2 class="control-title">Key</h2>
+			<table class="key-table">
+				<tr>
+					<td bgcolor="red" class="key-cell"></td>
+					<td class="key-description">Describe this color</td>
+				</tr>
+				<tr>
+					<td bgcolor="green" class="key-cell"></td>
+					<td class="key-description">Describe this color</td>
+				</tr>
+				<tr>
+					<td bgcolor="blue" class="key-cell"></td>
+					<td class="key-description">Describe this color</td>
+				</tr>
+				<tr>
+					<td bgcolor="yellow" class="key-cell"></td>
+					<td class="key-description">Describe this color</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 	<script type="text/javascript" src="run.js"></script>
 
 	</body>
