@@ -1,25 +1,21 @@
 .title {
 	text-align: center;
+	font-size: 20;
 	padding: 10px;
 	padding-bottom: 0px;
 }
 
 .sidebar {
 	position: fixed;
-	bottom: 10%;
-	right: 50%;
-	width: 500px;
-	height: 500px;
-	background-color: white;
+ 	top: 10%;
+ 	right: 0%;
+ 	height: 280px;
+ 	width: 250px;
 }
 
 .controls {
-	padding: 10px;
-	position:fixed;
-	left:28%;
 	height: 280px;
 	width: 250px;
-
 }
 
 .control-table {
@@ -55,11 +51,7 @@
 }
 
 .key {
-	padding: 10px;
-	position: fixed;
-	right:30%;
-	height: 280px;
-	width: 250px;
+	width: 250px
 }
 
 .key-table {

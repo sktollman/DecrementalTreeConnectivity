@@ -189,9 +189,9 @@ var Graph = function(container, nodes_param, edges_param) {
 		var options = { 
 			nodes: {
 		        shape: 'dot',
-		        size: 15,
+		        size: 10,
 		        font: {
-		            size: 20,
+		            size: 12,
 		            color: '#ffffff'
 		        },
 		        color: {
@@ -212,8 +212,8 @@ var Graph = function(container, nodes_param, edges_param) {
 					enabled: true,
 					direction: 'UD',
 					sortMethod: 'directed',
-					levelSeparation: 100,
-					treeSpacing: 100
+					levelSeparation: 70,
+					treeSpacing: 70
 				}
 			},
 			physics: {
