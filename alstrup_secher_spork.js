@@ -5,19 +5,19 @@ var AlstrupSecherSpork = function(graph) {
 	this.clusters = [];
 	this.clusterMap = {};
 
-	this.animationQueue = new Array()
+	this.animationQueue = new Array();
 
 	//for preprocessing
 	this.addCluster = function(cluster){
-		console.log(cluster)
+		console.log(cluster);
 		//update the variables to keep track of the cluster
-		var nodes = cluster.nodes
+		var nodes = cluster.nodes;
 		for(var n in nodes){
 			this.clusterMap[nodes[n]] = cluster;
 			// highlight nodes 
 		}
-		this.clusters.push(cluster); 
-		console.log(this.clusters)
+		this.clusters.push(cluster);
+		console.log(this.clusters);
 	};
 	//recursively generate clusters as per Fredrickson
 	this.makeCluster = function(node) {
@@ -80,8 +80,6 @@ var AlstrupSecherSpork = function(graph) {
 		}
 		//cluster all of the nodes
 		this.addCluster(this.makeCluster(rt));
-
-		console.log(this.clusters)
 
 		//add boundary node information
 		for(var c in this.clusters){
