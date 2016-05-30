@@ -24,7 +24,7 @@ var AlstrupSecherSpork = function(graph) {
 		//add the cluster to the map
 		this.clusterMap[node] = null;
 		var clus = [node];
-		var neighbors = this.graph.getNeighbors(node.id);
+		var neighbors = this.graph.getNeighbors(node);
 		var deg = neighbors.length;
 		var sz = 1;
 		for(var n in neighbors){
@@ -78,8 +78,9 @@ var AlstrupSecherSpork = function(graph) {
 				break;
 			}
 		}
+
 		//cluster all of the nodes
-		this.addCluster(this.makeCluster(rt));
+		this.addCluster(this.makeCluster(rt.id));
 
 		//add boundary node information
 		for(var c in this.clusters){

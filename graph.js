@@ -41,6 +41,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.getNeighbors = function(id) {
+		console.log(id)
 		return this.neighbors[id];
 	};
 
