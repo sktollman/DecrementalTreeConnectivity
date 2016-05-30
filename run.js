@@ -29,7 +29,7 @@ function randomGraph() {
 		nodes.push({id: id, label: id})
 	}
 	var edges = [];
-	for (n in numNodes) {
+	for (var n=1; n < numNodes; n++) {
 		id = (n+1).toString()
 		nodes.push({id: id, label: id})
 	}
