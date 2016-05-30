@@ -30,6 +30,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	}
 	for (var e in edges_param) {
 		this.neighbors[edges_param[e].from].push(edges_param[e].to);
+		this.neighbors[edges_param[e].to].push(edges_param[e].from);
 	}
 
 	this.edgeToId = {};
@@ -37,11 +38,11 @@ var Graph = function(container, nodes_param, edges_param) {
 		var edge = edges_param[e];
 		var fromTo = edge.from + edge.to;
 		this.edgeToId[fromTo] = edge.id;
-	}
+	};
 
 	this.getNeighbors = function(id) {
 		return this.neighbors[id];
-	}
+	};
 
 	this.addNode = function(id, label) {
 		this.nodes.add({
@@ -55,7 +56,14 @@ var Graph = function(container, nodes_param, edges_param) {
 			id: id, 
 			group: groupNum
 		});
-	}
+	};
+
+	this.enlargenNode = function(id) {
+		this.nodes.update({
+			id: id, 
+			size: 20
+		});
+	};
 
 	this.highlightNode = function(id, backgroundColor, borderColor) {
 		this.nodes.update({
@@ -65,14 +73,14 @@ var Graph = function(container, nodes_param, edges_param) {
 				border: borderColor
 			}
 		});
-	}
+	};
 
 	this.unhighlightNode = function(id) {
 		this.nodes.update({
 			id: id,
 			color: null
 		});
-	}
+	};
 
 	this.unhighlightAll = function() {
 		// later should update all edges too
@@ -92,7 +100,18 @@ var Graph = function(container, nodes_param, edges_param) {
 			}
 			
 		}
-	}
+	};
+
+	this.enlargenEdge = function(from, to) {
+		var fromTo = from + to
+		var id = this.edgeToId[fromTo];
+		this.edges.update({
+			id: id, 
+			from: from,
+			to: to,
+			width: 4
+		});
+	};
 
 	this.highlightEdge = function(from, to, c) {
 		var fromTo = from + to
@@ -106,7 +125,7 @@ var Graph = function(container, nodes_param, edges_param) {
 			},
 			dashes: true
 		});
-	}
+	};
 
 	this.unhighlightEdge = function(to, from) {
 		var fromTo = from + to
@@ -117,23 +136,23 @@ var Graph = function(container, nodes_param, edges_param) {
 			to: to,
 			color: null
 		});
-	}
+	};
 
 	this.getVertices = function() {
 		return this.nodes.get()
-	}
+	};
 
 	this.updateNode = function(id, label) {
 		this.nodes.update({
 			id: id,
 			label: label
 		});
-	}
+	};
 
 
 	this.removeNode = function(id) {
 		this.nodes.remove({id: id});
-	}
+	};
 
 
 	this.addEdge = function(id, from, to) {
@@ -142,7 +161,7 @@ var Graph = function(container, nodes_param, edges_param) {
 			from: from,
 			to: to
 		});
-	}
+	};
 
 
 	this.updateEdge = function(id, from, to) {
@@ -151,7 +170,7 @@ var Graph = function(container, nodes_param, edges_param) {
 			from: from,
 			to: to
 		});
-	}
+	};
 
 
 	this.removeEdge = function(from, to) {
@@ -159,7 +178,7 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.edges.remove({id: this.edgeToId[fromTo]});
 		var index = this.neighbors[from].indexOf(to);
 		this.neighbors[from].splice(index, 1);
-	}
+	};
 
 	this.draw = function() {
 		// create a network
@@ -183,7 +202,7 @@ var Graph = function(container, nodes_param, edges_param) {
 		    },
 		    edges: {
 		        width: 2,
-				arrows: 'to',
+				//arrows: 'to',
 				color: {
 					inherit: false
 				}

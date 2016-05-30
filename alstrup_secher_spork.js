@@ -1,6 +1,6 @@
 var AlstrupSecherSpork = function(graph) {
 	this.graph = graph;
-	this.numNodes = length(this.graph.getVertices());
+	this.numNodes = this.graph.getVertices().length;
 	this.logSize = Math.log(this.numNodes);
 	this.clusters = [];
 	this.clusterMap = {};
@@ -9,22 +9,24 @@ var AlstrupSecherSpork = function(graph) {
 
 	//for preprocessing
 	this.addCluster = function(cluster){
+		console.log(cluster)
 		//update the variables to keep track of the cluster
 		var nodes = cluster.nodes
 		for(var n in nodes){
 			this.clusterMap[nodes[n]] = cluster;
 			// highlight nodes 
 		}
-		this.clusters.push[cluster]; 
+		this.clusters.push(cluster); 
+		console.log(this.clusters)
 	};
 	//recursively generate clusters as per Fredrickson
 	this.makeCluster = function(node) {
 		//add the cluster to the map
 		this.clusterMap[node] = null;
 		var clus = [node];
-		var neighbors = this.graph.getNeighbors(node);
-		var deg = length(neighbors);
-		var size = 1;
+		var neighbors = this.graph.getNeighbors(node.id);
+		var deg = neighbors.length;
+		var sz = 1;
 		for(var n in neighbors){
 			var neighbor = neighbors[n]
 			if(!(neighbor in this.clusterMap)) continue;
@@ -43,17 +45,43 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(n)
 	this.preprocess = function() {
-		//pick a root node of degree one
+		//remake the graph such that all nodes have degree <= 3
 		var verts = this.graph.getVertices();
+		for (var i in verts) {
+			var node = verts[i].id;
+			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#e60000', '#990000']}); // red
+			var nbors = this.graph.getNeighbors(node);
+			var deg = nbors.length;
+		  	if(deg <= 3) continue;
+		    this.graph.removeNode(node); //I assume this removes edges incident to node as well
+		    var prevV = null;
+		    for(var j in nbors){
+		    	var nbor = nbors[j];
+		    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
+		    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
+			    this.graph.addNode(nbor, nbor);
+			    if (prevV != null) {
+			    	this.graph.addEdge(currV, prevV);
+			    }
+			    this.graph.addEdge(currV, nbor);
+			    prevV = currV;
+		    }
+		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
+		}
+
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+
 		var rt = null;
-		for(var vert in verts){
-			if(length(this.graph.getNeighbors(verts[vert])) === 1){
+		for (var vert in verts) {
+			if (this.graph.getNeighbors(verts[vert].id).length == 1) {
 				rt = verts[vert];
 				break;
 			}
 		}
 		//cluster all of the nodes
 		this.addCluster(this.makeCluster(rt));
+
+		console.log(this.clusters)
 
 		//add boundary node information
 		for(var c in this.clusters){
@@ -73,21 +101,27 @@ var AlstrupSecherSpork = function(graph) {
 		//go through all the boundary nodes and check their connectivity
 		var macroNodes = [];
 		var macroEdges = [];
+		var edgenum = 0;
+		
 		for(var c in this.clusters){
 			var clus = this.clusters[c]
+			console.log(clus.boundaries)
 			for(var b in clus.boundaries){
 				var bound = clus.boundaries[b]
-				macroNodes.push(bound);
+				macroNodes.push({id: bound, label: bound});
 				var neighbors = this.graph.getNeighbors(bound)
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
-						macroEdges.push([bound, nbor]);
+						macroEdges.push({id: edgenum, from: bound, to: nbor});
+						edgenum++;
 						// make this edge bigger
 					}
 				}
 			}
 		}
+		console.log(macroNodes)
+		console.log(macroEdges)
 		//make macro representation
 		this.macroGraph = new Graph(macroNodes, macroEdges);
 		this.macroESRepr = new EvenShiloach(this.macroGraph);

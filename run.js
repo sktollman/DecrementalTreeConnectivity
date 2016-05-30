@@ -20,7 +20,7 @@ function query() {
 function preprocess() {
 	naive.preprocess();
 	es.preprocess();
-	//spork.preprocess();
+	spork.preprocess();
 	document.getElementById("preprocess").disabled=true;
 	highlight();
 	
@@ -39,7 +39,7 @@ function deleteEdge() {
 }
 
 function highlight() {
-	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && /*spork.animationQueue.length == 0 &&*/ es.animationQueue.length == 0) {
+	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && spork.animationQueue.length == 0 && es.animationQueue.length == 0) {
 		document.getElementById("query").disabled=false;
 		document.getElementById("remove").disabled=false;
 		return;
@@ -57,11 +57,11 @@ function highlight() {
 
 	}
 	
-	// if (spork.animationQueue.length > 0) {
-	//     var action = spork.animationQueue[0]
-	//     action.func.apply(action.that, action.args)
-	//     spork.animationQueue.splice(0,1)
-	// }
+	if (spork.animationQueue.length > 0) {
+	    var action = spork.animationQueue[0]
+	    action.func.apply(action.that, action.args)
+	    spork.animationQueue.splice(0,1)
+	}
 
 	if (es.animationQueue.length > 0) {
 		var action = es.animationQueue[0];
