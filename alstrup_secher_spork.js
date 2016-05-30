@@ -28,8 +28,8 @@ var AlstrupSecherSpork = function(graph) {
 		var deg = neighbors.length;
 		var sz = 1;
 		for(var n in neighbors){
-			var neighbor = neighbors[n]
-			if(!(neighbor in this.clusterMap)) continue;
+			var neighbor = neighbors[n];
+			if(neighbor in this.clusterMap) continue;
 			var nborCluster = this.makeCluster(neighbor);
 			if(deg + nborCluster.degree - 2 <= 2 && sz + nborCluster.size <= this.logSize){
 				clus += nborCluster.nodes;
@@ -52,21 +52,21 @@ var AlstrupSecherSpork = function(graph) {
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#e60000', '#990000']}); // red
 			var nbors = this.graph.getNeighbors(node);
 			var deg = nbors.length;
-		  	if(deg <= 3) continue;
-		    this.graph.removeNode(node); //I assume this removes edges incident to node as well
-		    var prevV = null;
-		    for(var j in nbors){
-		    	var nbor = nbors[j];
-		    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
-		    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
-			    this.graph.addNode(nbor, nbor);
-			    if (prevV != null) {
-			    	this.graph.addEdge(currV, prevV);
-			    }
-			    this.graph.addEdge(currV, nbor);
-			    prevV = currV;
+	  	if(deg <= 3) continue;
+	    this.graph.removeNode(node); //I assume this removes edges incident to node as well
+	    var prevV = null;
+	    for(var j in nbors){
+	    	var nbor = nbors[j];
+	    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
+	    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
+		    this.graph.addNode(nbor, nbor);
+		    if (prevV != null) {
+		    	this.graph.addEdge(currV, prevV);
 		    }
-		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
+		    this.graph.addEdge(currV, nbor);
+		    prevV = currV;
+	    }
+	    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
 		}
 
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
@@ -187,10 +187,10 @@ var AlstrupSecherSpork = function(graph) {
 		var boundaries2 = [];
 		for (var vert in clu2.boundaries) {
 			if (this.microquery(vert2, vert)) {
-				boundaries1.push(vert);
+				boundaries2.push(vert);
 			}
 		}
-		//check the boundary nodes we found for macro connetivity
+		//check the boundary nodes we found for macro connectivity
 		for (var macVert1 in boundaries1) {
 			for (var macVert2 in boundaries2) {
 				if (this.macroquery(macVert1, macVert2))
