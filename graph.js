@@ -273,6 +273,8 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.edges.remove({id: this.edgeToId[fromTo]});
 		var index = this.neighbors[from].indexOf(to);
 		this.neighbors[from].splice(index, 1);
+		var index = this.neighbors[to].indexOf(from);
+		this.neighbors[to].splice(index, 1);
 	};
 
 	this.draw = function() {
