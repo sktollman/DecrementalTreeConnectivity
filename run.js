@@ -36,6 +36,10 @@ function randomGraph() {
 	return {nodes: nodes, edges: edges}
 }
 
+function initializeDataStructures() {
+
+}
+
 function query() {
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
@@ -48,14 +52,20 @@ function query() {
 	document.getElementById('query-result').innerHTML = result;
 	document.getElementById("query").disabled=true;
 	document.getElementById("remove").disabled=true;
+	pause = parseInt(document.getElementById("pause").value);
+	if (pause > 0) delay = pause;
 	highlight();
 }
 
 function preprocess() {
+	initializeDataStructures();
 	naive.preprocess();
 	es.preprocess();
 	spork.preprocess();
 	document.getElementById("preprocess").disabled=true;
+	pause = parseInt(document.getElementById("pause").value);
+	if (pause > 0) delay = pause;
+	console.log(pause)
 	highlight();
 	
 }
@@ -69,27 +79,29 @@ function deleteEdge() {
 	//spork.deleteEdge();
 	document.getElementById("query").disabled=true;
 	document.getElementById("remove").disabled=true;
+	pause = parseInt(document.getElementById("pause").value);
+	if (pause > 0) delay = pause;
 	highlight();
 }
 
 function highlight() {
-	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && spork.animationQueue.length == 0 && es.animationQueue.length == 0) {
+	if (/*sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && */spork.animationQueue.length == 0 /*&& es.animationQueue.length == 0*/) {
 		document.getElementById("query").disabled=false;
 		document.getElementById("remove").disabled=false;
 		return;
 	}
 	
-	if (sn.animationQueue.length > 0) {
-		var action = sn.animationQueue[0]
-		action.func.apply(action.that, action.args)
-		sn.animationQueue.splice(0,1)
-	}
-	if (naive.animationQueue.length > 0) {
-		var action = naive.animationQueue[0];
-		action.func.apply(action.that, action.args);
-		naive.animationQueue.splice(0,1);
+	// if (sn.animationQueue.length > 0) {
+	// 	var action = sn.animationQueue[0]
+	// 	action.func.apply(action.that, action.args)
+	// 	sn.animationQueue.splice(0,1)
+	// }
+	// if (naive.animationQueue.length > 0) {
+	// 	var action = naive.animationQueue[0];
+	// 	action.func.apply(action.that, action.args);
+	// 	naive.animationQueue.splice(0,1);
 
-	}
+	// }
 	
 	if (spork.animationQueue.length > 0) {
 	    var action = spork.animationQueue[0]
@@ -97,11 +109,11 @@ function highlight() {
 	    spork.animationQueue.splice(0,1)
 	}
 
-	if (es.animationQueue.length > 0) {
-		var action = es.animationQueue[0];
-		action.func.apply(action.that, action.args);
-		es.animationQueue.splice(0,1);
-	}
+	// if (es.animationQueue.length > 0) {
+	// 	var action = es.animationQueue[0];
+	// 	action.func.apply(action.that, action.args);
+	// 	es.animationQueue.splice(0,1);
+	// }
 
 	setTimeout(function() { highlight() }, delay)
 	// allow the user to set the animation speed

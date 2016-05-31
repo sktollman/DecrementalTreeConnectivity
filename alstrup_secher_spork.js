@@ -9,12 +9,13 @@ var AlstrupSecherSpork = function(graph) {
 
 	//for preprocessing
 	this.addCluster = function(cluster){
-		console.log(cluster);
 		//update the variables to keep track of the cluster
 		var nodes = cluster.nodes;
 		for(var n in nodes){
 			this.clusterMap[nodes[n]] = cluster;
 			// highlight nodes 
+			// clusters.length will be the eventual index of this cluster
+			this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [nodes[n], this.clusters.length+1]});
 		}
 		this.clusters.push(cluster);
 		console.log(this.clusters);
@@ -96,6 +97,7 @@ var AlstrupSecherSpork = function(graph) {
 					if(this.clusterMap[nbors[nbor]] !== clus){
 						clus.boundaries.push(node);
 						// make that node bigger
+						this.animationQueue.push({func: this.graph.enlargeNode, that: this.graph, args: [node]});
 						break;
 					}
 				}
@@ -116,9 +118,12 @@ var AlstrupSecherSpork = function(graph) {
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
-						if (parseInt(bound) < parseInt(nbor)) macroEdges.push({id: edgenum, from: bound, to: nbor});
-						edgenum++;
-						// make this edge bigger
+						if (parseInt(bound) < parseInt(nbor)) {
+							macroEdges.push({id: edgenum, from: bound, to: nbor});
+							edgenum++;
+							// make this edge bigger
+							this.animationQueue.push({func: this.graph.enlargeEdge, that: this.graph, args: [bound, nbor]});
+						}
 					}
 				}
 			}
@@ -141,11 +146,13 @@ var AlstrupSecherSpork = function(graph) {
 			// DFS COLORING
 			while(stack.length > 0){
 				var curr = stack.pop();
+				//this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
 				searched.push[curr];
 				var neighbors = this.graph.getNeighbors(curr)
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(nbor in searched || this.clusterMap[nbor] !== clus) continue;
+					//this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
 					//add edge to lists
 					stack.push(nbor);
 					clus.microEdges.push([curr, nbor]);

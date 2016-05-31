@@ -87,11 +87,11 @@
 			<table class="control-table">
 				<tr>
 					<td class="control-cell"><label for="edge-from" class="fromto">Node 1</label></td>
-					<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
+					<td class="control-cell"><input id="edge-from" type="text" value=""></td>
 				</tr>
 				<tr>
 					<td class="control-cell"><label for="edge-to" class="fromto">Node 2</label></td>
-					<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
+					<td class="control-cell"><input id="edge-to" type="text" value=""></td>
 				</tr>
 				<tr>
 					<td class="control-cell"></td>
@@ -108,13 +108,16 @@
 				<tr>
 					<td class="control-cell"></td>
 					<td class="control-cell">
-						<!-- make this only enabled at the beginning, and disable others when it is enabled -->
 						<button id="preprocess" class="control-button" onclick="preprocess();">Preprocess</button>
 					</td>
 				</tr>
 				<tr>
 					<td class="control-cell"><label class="fromto" for="result">Result: </label></td>
 					<td class="control-cell"><label class="result" for="query-result" id="query-result">No queries yet!</label></td>
+				</tr>
+				<tr>
+					<td class="control-cell"><label for="pause" class="fromto">Delay (ms)</label></td>
+					<td class="control-cell"><input id="pause" type="text" value="200"></td>
 				</tr>
 			</table>
 		</div>
@@ -141,37 +144,22 @@
 		</div>
 	</div>
 	<div class="create-graph">
-		<h3 class="control-title">Create Tree</h3>
-		<button id="default-graph" class="control-button" onclick="query();">Use Default</button>
-		<button id="random-graph" class="control-button" onclick="query();">Random Graph</button>
-		<button id="random-graph" class="control-button" onclick="query();">Add Node</button>
+		
+		<table>
 		<tr>
-			<td class="control-cell"><label for="edge-from" class="fromto">Node 1</label></td>
-			<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
+			<td class="control-cell"><h3 class="control-title">Create Tree</h3></td>
+			<td class="control-cell"><button id="random-graph" class="control-button" onclick="randomGraph();">Random Graph</button></td>
+			<td class="control-cell"><button id="default-graph" class="control-button" onclick="defaultGraph();">Default Graph</button></td>
+			<td class="control-cell"></td>
+			<td class="control-cell"><button id="add-node" class="control-button" onclick="addNode();">Add Node</button></td>
+
+			<td class="control-cell"><label for="edge-from-create" class="fromto">Node 1</label></td>
+			<td class="control-cell"><input id="edge-from-create" type="text" value=""></td>
+			<td class="control-cell"><label for="edge-to-create" class="fromto">Node 2</label></td>
+			<td class="control-cell"><input id="edge-to-create" type="text" value=""></td>
+			<td class="control-cell"><button id="add-edge" class="control-button" onclick="addEdge();">Add Edge</button></td>
 		</tr>
-		<tr>
-			<td class="control-cell"><label for="edge-to" class="fromto">Node 2</label></td>
-			<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
-		</tr>
-		<button id="default-graph" class="control-button" onclick="query();">Add Edge</button>
-		<!--table class="key-table">
-			<tr>
-				<td bgcolor="#e60000" class="key-cell"></td>
-				<td class="key-description">Current node</td>
-			</tr>
-			<tr>
-				<td bgcolor="#ffff00" class="key-cell"></td>
-				<td class="key-description">Enqueued</td>
-			</tr>
-			<tr>
-				<td bgcolor="#878787" class="key-cell"></td>
-				<td class="key-description">Searched</td>
-			</tr>
-			<tr>
-				<td bgcolor="#00FF00" class="key-cell"></td>
-				<td class="key-description">Found</td>
-			</tr>
-		</table-->
+		</table>
 	</div>
 	<script type="text/javascript" src="run.js"></script>
 

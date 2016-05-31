@@ -4,6 +4,15 @@
  */
 
 var Graph = function(container, nodes_param, edges_param) {
+	var distinctColors = ['#ff0000', '#591616', '#ff8080', '#d96236', '#734939', '#4c1f00', 
+	'#4d4139', '#f28100', '#332200', '#f2b63d', '#ffeabf', '#998c73', '#665200', '#a3bf30', 
+	'#3e592d', '#8da67c', '#39e639', '#00731f', '#39e6ac', '#00d6e6', '#007780', '#003033', 
+	'#36a3d9', '#b6def2', '#163a59', '#00388c', '#80a2ff', '#69738c', '#3d3df2', '#1c0d33', 
+	'#3c0059', '#bf73e6', '#cc00ff', '#ffbffb', '#661a4d', '#e63995', '#806071', '#330014', 
+	'#e6acbb', '#a60016', '#8c464f']
+
+	var nodeBackgroundColor = '#EEE9E9'
+
 	// default values
 	if (nodes_param == undefined) nodes_param = [
 			{id: '1', label: '1'},
@@ -39,6 +48,8 @@ var Graph = function(container, nodes_param, edges_param) {
 		var edge = edges_param[e];
 		var fromTo = edge.from + edge.to;
 		this.edgeToId[fromTo] = edge.id;
+		var toFrom = edge.to + edge.from;
+		this.edgeToId[toFrom] = edge.id;
 	};
 
 	this.getNeighbors = function(id) {
@@ -60,7 +71,7 @@ var Graph = function(container, nodes_param, edges_param) {
 		});
 	};
 
-	this.enlargenNode = function(id) {
+	this.enlargeNode = function(id) {
 		this.nodes.update({
 			id: id, 
 			size: 20
@@ -104,14 +115,14 @@ var Graph = function(container, nodes_param, edges_param) {
 		}
 	};
 
-	this.enlargenEdge = function(from, to) {
+	this.enlargeEdge = function(from, to) {
 		var fromTo = from + to
 		var id = this.edgeToId[fromTo];
 		this.edges.update({
 			id: id, 
 			from: from,
 			to: to,
-			width: 4
+			width: 8
 		});
 	};
 
@@ -222,49 +233,48 @@ var Graph = function(container, nodes_param, edges_param) {
 				enabled: false
 			},
 			groups: {
-				// what if the nodes could be default colored but insides are all same as background color? 
-				'1': {
-					color: {
-						background: '#EEE9E9',
-						border: '#FF1493'
-					}
-				},
-				'2': {
-					color: {
-						background: '#EEE9E9',
-						border: '#00BFFF'
-					}
-				},
-				'3': {
-					color: {
-						background: '#EEE9E9',
-						border: '#00EEEE'
-					}
-				},
-				'4': {
-					color: {
-						background: '#EEE9E9',
-						border: '#5CACEE'
-					}
-				},
-				'5': {
-					color: {
-						background: '#EEE9E9',
-						border: '#9ACD32'
-					}
-				},
-				'6': {
-					color: {
-						background: '#EEE9E9',
-						border: '#9B30FF'
-					}
-				},
-				'7': {
-					color: {
-						background: '#EEE9E9',
-						border: '#FA8072'
-					}
-				}
+				'1': { color: { background: nodeBackgroundColor, border: '#FF1493' } },
+				'2': { color: { background: nodeBackgroundColor, border: distinctColors[18] } },
+				'3': { color: { background: nodeBackgroundColor, border: distinctColors[28] } },
+				'4': { color: { background: nodeBackgroundColor, border: distinctColors[15] } },
+				'5': { color: { background: nodeBackgroundColor, border: distinctColors[31] } },
+				'6': { color: { background: nodeBackgroundColor, border: distinctColors[16] } },
+				'7': { color: { background: nodeBackgroundColor, border: distinctColors[0] } },
+				'8': { color: { background: nodeBackgroundColor, border: distinctColors[1] } },
+				'9': { color: { background: nodeBackgroundColor, border: distinctColors[38] } },
+				'10': { color: { background: nodeBackgroundColor, border: distinctColors[2] } },
+				'11': { color: { background: nodeBackgroundColor, border: distinctColors[3] } },
+				'12': { color: { background: nodeBackgroundColor, border: distinctColors[4] } },
+				'13': { color: { background: nodeBackgroundColor, border: distinctColors[5] } },
+				'14': { color: { background: nodeBackgroundColor, border: distinctColors[6] } },
+				'15': { color: { background: nodeBackgroundColor, border: distinctColors[7] } },
+				'16': { color: { background: nodeBackgroundColor, border: distinctColors[8] } },
+				'17': { color: { background: nodeBackgroundColor, border: distinctColors[9] } },
+				'18': { color: { background: nodeBackgroundColor, border: distinctColors[10] } },
+				'19': { color: { background: nodeBackgroundColor, border: distinctColors[11] } },
+				'20': { color: { background: nodeBackgroundColor, border: distinctColors[12] } },
+				'21': { color: { background: nodeBackgroundColor, border: distinctColors[13] } },
+				'22': { color: { background: nodeBackgroundColor, border: distinctColors[14] } },
+				'23': { color: { background: nodeBackgroundColor, border: distinctColors[17] } },
+				'24': { color: { background: nodeBackgroundColor, border: distinctColors[19] } },
+				'25': { color: { background: nodeBackgroundColor, border: distinctColors[20] } },
+				'26': { color: { background: nodeBackgroundColor, border: distinctColors[21] } },
+				'27': { color: { background: nodeBackgroundColor, border: distinctColors[22] } },
+				'28': { color: { background: nodeBackgroundColor, border: distinctColors[23] } },
+				'29': { color: { background: nodeBackgroundColor, border: distinctColors[24] } },
+				'30': { color: { background: nodeBackgroundColor, border: distinctColors[25] } },
+				'31': { color: { background: nodeBackgroundColor, border: distinctColors[26] } },
+				'32': { color: { background: nodeBackgroundColor, border: distinctColors[27] } },
+				'33': { color: { background: nodeBackgroundColor, border: distinctColors[29] } },
+				'34': { color: { background: nodeBackgroundColor, border: distinctColors[30] } },
+				'35': { color: { background: nodeBackgroundColor, border: distinctColors[32] } },
+				'36': { color: { background: nodeBackgroundColor, border: distinctColors[33] } },
+				'37': { color: { background: nodeBackgroundColor, border: distinctColors[34] } },
+				'38': { color: { background: nodeBackgroundColor, border: distinctColors[35] } },
+				'39': { color: { background: nodeBackgroundColor, border: distinctColors[36] } },
+				'40': { color: { background: nodeBackgroundColor, border: distinctColors[37] } },
+				'41': { color: { background: nodeBackgroundColor, border: distinctColors[39] } },
+				'42': { color: { background: nodeBackgroundColor, border: distinctColors[40] } },
 			}
 		};
 		this.network = new vis.Network(this.container, data, options);
