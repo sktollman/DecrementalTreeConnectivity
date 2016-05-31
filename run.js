@@ -146,16 +146,17 @@ function query() {
 	console.log('query')
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
-	console.log('got values')
+
+	// if not in graph, do nothing. 
+	if (!sn.graph.containsNode(vert1) || !sn.graph.containsNode(vert2)) {
+		return;
+	}
+
 	var result = sn.query(vert1, vert2);
-	console.log('sn')
 	naive.query(vert1, vert2);
-	console.log('naive')
 	es.query(vert1, vert2);
-	console.log('es')
 	spork.query(vert1, vert2);
-	console.log('spork')
-	
+
 	console.log(result);
 	document.getElementById('query-result').innerHTML = result;
 	document.getElementById("query").disabled=true;
@@ -186,6 +187,11 @@ function preprocess() {
 function deleteEdge() {
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
+
+	if (!sn.graph.containsEdge(vert1,vert2)) {
+		return;
+	}
+
 	sn.deleteEdge(vert1, vert2);
 	naive.deleteEdge(vert1, vert2);
 	es.deleteEdge(vert1, vert2);

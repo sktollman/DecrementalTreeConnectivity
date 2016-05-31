@@ -205,6 +205,16 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.nodes.remove({id: id});
 	};
 
+	this.containsNode = function(id) {
+		return (id in this.nodes.get());
+	};
+
+	this.containsEdge = function(from, to) {
+		var fromTo = from + to
+		var id = this.edgeToId[fromTo];
+		return (id in this.edges.get());
+	};
+
 	this.clearGraph = function(id) {
 		items = this.nodes.get();
 		for (var i in items) {
@@ -279,7 +289,7 @@ var Graph = function(container, nodes_param, edges_param) {
 					sortMethod: 'directed',
 					levelSeparation: 70,
 					nodeSpacing: 135,
-					treeSpacing: 70
+					treeSpacing: 135
 				}
 			},
 			physics: {
