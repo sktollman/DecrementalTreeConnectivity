@@ -8,6 +8,7 @@ var SuperNaive = function(graph) {
 	//O(n)
 	this.query = function(vert1, vert2) {
 		//DFS over vert1's component looking for vert2
+		this.animationQueue = [] // clear queue
 		var stack = [vert1];
 		var searched = [];
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
@@ -33,6 +34,7 @@ var SuperNaive = function(graph) {
 
 	//O(1)
 	this.deleteEdge = function(vert1, vert2) { 
+		this.animationQueue = []
         this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
         this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
         this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 

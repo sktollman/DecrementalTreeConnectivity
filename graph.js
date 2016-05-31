@@ -101,7 +101,7 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	this.unhighlightAll = function() {
 		// later should update all edges too
-		items = this.nodes.get()
+		items = this.nodes.get();
 		for (var i in items) {
 			//console.log(items[i].group)
 			if (items[i].group) {
@@ -205,6 +205,13 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.nodes.remove({id: id});
 	};
 
+	this.clearGraph = function(id) {
+		items = this.nodes.get();
+		for (var i in items) {
+			this.nodes.remove({id: items[i].id});
+		}
+	};
+
 
 	this.addEdge = function(id, from, to) {
 		if (!(to in this.neighbors) || !(from in this.neighbors)) return;
@@ -271,6 +278,7 @@ var Graph = function(container, nodes_param, edges_param) {
 					direction: 'UD',
 					sortMethod: 'directed',
 					levelSeparation: 70,
+					nodeSpacing: 135,
 					treeSpacing: 70
 				}
 			},

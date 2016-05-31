@@ -1,15 +1,15 @@
-document.getElementById("preprocess").disabled=true;
-document.getElementById("add-edge").disabled=true;
-document.getElementById("query").disabled=true;
-document.getElementById("remove").disabled=true; 
+
 var delay = 200 // make slider
 
 // ** should also allow the user to delete nodes and edges? 
 
-var sn = undefined;
-var naive = undefined;
-var es = undefined;
-var spork = undefined;
+var sn;
+var naive;
+var es;
+var spork;
+var nodesWithoutEdges;
+
+reset();
 
 function defaultGraph() {
 	var nodes = [
@@ -27,6 +27,30 @@ function defaultGraph() {
 				];
 
 	createAllGraphs(nodes, edges);	
+}
+
+function reset() {
+	document.getElementById("preprocess").disabled=true;
+	document.getElementById("add-edge").disabled=true;
+	document.getElementById("query").disabled=true;
+	document.getElementById("remove").disabled=true; 
+	document.getElementById("clear").disabled=true; 
+	document.getElementById("default-graph").disabled=false;
+	document.getElementById("random-graph").disabled=false;
+
+	
+	if (sn != undefined) {
+		sn.graph.clearGraph();
+		naive.graph.clearGraph();
+		es.graph.clearGraph();
+		spork.graph.clearGraph();
+	}
+
+	sn = undefined;
+	naive = undefined;
+	es = undefined;
+	spork = undefined;
+	nodesWithoutEdges = {};
 }
 
 function createAllGraphs(nodes, edges) { 
@@ -52,6 +76,7 @@ function createAllGraphs(nodes, edges) {
 
 	// disable random and default buttons, enable edge add and preprocess.
 	document.getElementById("preprocess").disabled=false;
+	document.getElementById("clear").disabled=false;
 	document.getElementById("add-node").disabled=false;
 	document.getElementById("add-edge").disabled=false;
 	document.getElementById("default-graph").disabled=true;
@@ -64,20 +89,35 @@ function addNode() {
  		createAllGraphs([], []);
  	}
  	var id = sn.graph.nextNodeId(); // will be the same for all of them
- 	sn.graph.addNode(id, id)
- 	naive.graph.addNode(id, id)
- 	es.graph.addNode(id, id)
- 	spork.graph.addNode(id, id)
+
+ 	// turn off the preprocess button until an edge is added, as it is not yet a valid tree
+	document.getElementById("preprocess").disabled=true;
+	nodesWithoutEdges[id] = true;
+
+ 	sn.graph.addNode(id, id);
+ 	naive.graph.addNode(id, id);
+ 	es.graph.addNode(id, id);
+ 	spork.graph.addNode(id, id);
 }
 
 function addEdge() {
 	var vert1 = document.getElementById('edge-from-create').value
 	var vert2 = document.getElementById('edge-to-create').value
+
+	if (sn.query(vert1, vert2)) return; // there is a path between the vertices, adding an edge would cause a cycle
+
 	var id = sn.graph.nextEdgeId(); // will be the same for all of them
 	sn.graph.addEdge(id, vert1, vert2)
  	naive.graph.addEdge(id, vert1, vert2)
  	es.graph.addEdge(id, vert1, vert2)
  	spork.graph.addEdge(id, vert1, vert2)
+
+ 	if (vert1 in nodesWithoutEdges) delete nodesWithoutEdges[vert1];
+ 	if (vert2 in nodesWithoutEdges) delete nodesWithoutEdges[vert2];
+
+ 	// enable the preprocess button if it is a valid tree (i.e. connected)
+ 	if (Object.keys(nodesWithoutEdges).length === 0)
+ 		document.getElementById("preprocess").disabled=false;
 
 }
 
@@ -119,6 +159,7 @@ function query() {
 	console.log(result);
 	document.getElementById('query-result').innerHTML = result;
 	document.getElementById("query").disabled=true;
+	document.getElementById("clear").disabled=true;
 	document.getElementById("remove").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
@@ -134,6 +175,7 @@ function preprocess() {
 	es.preprocess();
 	spork.preprocess();
 	document.getElementById("preprocess").disabled=true;
+	document.getElementById("clear").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
 	console.log(pause)
@@ -150,6 +192,7 @@ function deleteEdge() {
 	spork.deleteEdge(vert1, vert2);
 	document.getElementById("query").disabled=true;
 	document.getElementById("remove").disabled=true;
+	document.getElementById("clear").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
 	highlight();
@@ -159,6 +202,7 @@ function highlight() {
 	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && spork.animationQueue.length == 0 && es.animationQueue.length == 0) {
 		document.getElementById("query").disabled=false;
 		document.getElementById("remove").disabled=false;
+		document.getElementById("clear").disabled=false;
 		return;
 	}
 	
