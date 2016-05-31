@@ -1,7 +1,7 @@
 var AlstrupSecherSpork = function(graph) {
 	this.graph = graph;
 	this.numNodes = this.graph.getVertices().length;
-	this.logSize = Math.log(this.numNodes);
+	this.logSize = 3 * Math.log(this.numNodes);
 	this.clusters = [];
 	this.clusterMap = {};
 
@@ -33,7 +33,7 @@ var AlstrupSecherSpork = function(graph) {
 			if(neighbor in this.clusterMap) continue;
 			var nborCluster = this.makeCluster(neighbor);
 			if(deg + nborCluster.degree - 2 <= 2 && sz + nborCluster.size <= this.logSize){
-				clus += nborCluster.nodes;
+				clus = clus.concat(nborCluster.nodes);
 				deg += nborCluster.degree - 2;
 				sz += nborCluster.size;
 			}
@@ -127,7 +127,7 @@ var AlstrupSecherSpork = function(graph) {
 					}
 				}
 				for(var n in clus.boundaries){
-					var nbor = neighbors[n];
+					var nbor = clus.boundaries[n];
 					if (parseInt(bound) < parseInt(nbor)) {
 						macroEdges.push({id: edgenum, from: bound, to: nbor});
 						edgenum++;
@@ -151,7 +151,7 @@ var AlstrupSecherSpork = function(graph) {
 			//get list of all edges in cluster with DFS
 			clus.microEdges = [];
 			var stack = [clus.boundaries[0]];
-			var searched = [];
+			var searched = {};
 
 			// highlight label, change, unhighlight 
 			var nbor = clus.boundaries[0];
@@ -164,7 +164,7 @@ var AlstrupSecherSpork = function(graph) {
 			while(stack.length > 0){
 				var curr = stack.pop();
 				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
-				searched.push[curr];
+				searched[curr] = true;
 				var neighbors = this.graph.getNeighbors(curr)
 				for(var n in neighbors){
 					var nbor = neighbors[n]
@@ -178,7 +178,7 @@ var AlstrupSecherSpork = function(graph) {
 					clus.pathWords[nbor] = clus.pathWords[curr] | (1 << newEdgeInd);
 					// highlight label, change, unhighlight 
 					this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
-					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, clus.pathwords[nbor].toString()]}); 
+					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, clus.pathWords[nbor].toString()]}); 
 					this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
 
 				}
@@ -216,7 +216,12 @@ var AlstrupSecherSpork = function(graph) {
 		// highlight both nodes
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert1, '#e60000', '#990000']}); // red
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert2, '#e60000', '#990000']}); // red
-		return (((cluster.pathWords[micVert1] ^ cluster.pathWords[micVert2]) & ~cluster.edgeWord) === 0);
+		var x = cluster.pathWords[micVert1];
+		var y = cluster.pathWords[micVert2];
+		var r = x ^ y;
+		var p = ~cluster.edgeWord;
+		var s = r & p;
+		return s === 0;
 	};
 
 	//O(1)
@@ -233,8 +238,6 @@ var AlstrupSecherSpork = function(graph) {
 
 		//if they're in the same cluster, just check the micro connectivity
 		if (clu1 === clu2) {
-			return this.microquery(vert1, vert2);
-			// green if return true
 			if (this.microquery(vert1, vert2)) {
 				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#00FF00', '#32CD32']}); // green
 				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#00FF00', '#32CD32']}); // green
@@ -297,9 +300,16 @@ var AlstrupSecherSpork = function(graph) {
 		//find the cluster and delete there
 		var cluster = this.clusterMap[vert1];
 		if(cluster === this.clusterMap[vert2]){
-			var edgeInd = cluster.microEdges.findIndex(function(edge){return (vert1 in edge && vert2 in edge)});
+			var edgeInd = -1;
+			for(var e in cluster.microEdges){
+				var edge = cluster.microEdges[e];
+				if((vert1 === edge[0] && vert2 === edge[1]) || (vert1 === edge[1] && vert2 === edge[2])){
+					edgeInd = e;
+					break;
+				}
+			}
 			cluster.edgeWord &= ~(1 << edgeInd);
-			var nbor = clus.boundaries[0];
+			var nbor = cluster.boundaries[0];
 			this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
 			this.animationQueue.push({func: this.graph.updateMacroBit, that: this.graph, args: [nbor, intToBitString(cluster.edgeWord)]}); 
 			this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
