@@ -100,10 +100,8 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.unhighlightAll = function() {
-		// later should update all edges too
-		items = this.nodes.get()
+		items = this.nodes.get();
 		for (var i in items) {
-			//console.log(items[i].group)
 			if (items[i].group) {
 				this.nodes.update({
 					id: items[i].id,
@@ -118,6 +116,28 @@ var Graph = function(container, nodes_param, edges_param) {
 			
 		}
 	};
+
+	this.unhighlightES = function(esgraph) {
+		items = esgraph.nodes.get();
+		for (var i in items) {
+			this.nodes.update({
+				id: items[i].id,
+				color:  {
+					background: esgroups[items[i].group],
+					border: groups[this.nodes.get(items[i].id).group].color.border
+				}
+			});
+		}
+	}
+
+	this.updateESGroup = function(id, group) {
+		this.nodes.update({
+			id: id, 
+			color: {
+				background: groups[group].border
+			}
+		});
+	}
 
 	this.updateLabelColor = function(id, color) {
 		this.nodes.update({
@@ -205,6 +225,22 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.nodes.remove({id: id});
 	};
 
+	this.containsNode = function(id) {
+		return (this.nodes.get(id) != undefined);
+	};
+
+	this.containsEdge = function(from, to) {
+		var fromTo = from + to
+		return (this.edgeToId[fromTo] != undefined);
+	};
+
+	this.clearGraph = function(id) {
+		items = this.nodes.get();
+		for (var i in items) {
+			this.nodes.remove({id: items[i].id});
+		}
+	};
+
 
 	this.addEdge = function(id, from, to) {
 		if (!(to in this.neighbors) || !(from in this.neighbors)) return;
@@ -233,9 +269,14 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	this.removeEdge = function(from, to) {
 		var fromTo = from + to;
+		var toFrom = to + from;
 		this.edges.remove({id: this.edgeToId[fromTo]});
 		var index = this.neighbors[from].indexOf(to);
 		this.neighbors[from].splice(index, 1);
+		var index = this.neighbors[to].indexOf(from);
+		this.neighbors[to].splice(index, 1);
+		delete this.edgeToId[fromTo];
+		delete this.edgeToId[toFrom];
 	};
 
 	this.draw = function() {
@@ -271,13 +312,19 @@ var Graph = function(container, nodes_param, edges_param) {
 					direction: 'UD',
 					sortMethod: 'directed',
 					levelSeparation: 70,
-					treeSpacing: 70
+					nodeSpacing: 135,
+					treeSpacing: 135
 				}
 			},
 			physics: {
 				enabled: false
 			},
-			groups: {
+			groups: groups
+		};
+		this.network = new vis.Network(this.container, data, options);
+	}
+
+	var groups = {
 				'1': { color: { background: nodeBackgroundColor, border: '#FF1493' } },
 				'2': { color: { background: nodeBackgroundColor, border: distinctColors[18] } },
 				'3': { color: { background: nodeBackgroundColor, border: distinctColors[28] } },
@@ -321,9 +368,14 @@ var Graph = function(container, nodes_param, edges_param) {
 				'41': { color: { background: nodeBackgroundColor, border: distinctColors[39] } },
 				'42': { color: { background: nodeBackgroundColor, border: distinctColors[40] } },
 			}
-		};
-		this.network = new vis.Network(this.container, data, options);
-	}
+
+		var esgroups = {
+			'1': '#FFC0CB',
+			'2': '#E0FFFF',
+			'3': '#FFBBFF',
+			'4': '#F0FFF0',
+			'5': '#FFFACD'
+		}
 };
 
 // convenience function

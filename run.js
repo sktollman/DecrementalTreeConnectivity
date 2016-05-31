@@ -1,15 +1,15 @@
-document.getElementById("preprocess").disabled=true;
-document.getElementById("add-edge").disabled=true;
-document.getElementById("query").disabled=true;
-document.getElementById("remove").disabled=true; 
+
 var delay = 200 // make slider
 
 // ** should also allow the user to delete nodes and edges? 
 
-var sn = undefined;
-var naive = undefined;
-var es = undefined;
-var spork = undefined;
+var sn;
+var naive;
+var es;
+var spork;
+var nodesWithoutEdges;
+
+reset();
 
 function defaultGraph() {
 	var nodes = [
@@ -27,6 +27,30 @@ function defaultGraph() {
 				];
 
 	createAllGraphs(nodes, edges);	
+}
+
+function reset() {
+	document.getElementById("preprocess").disabled=true;
+	document.getElementById("add-edge").disabled=true;
+	document.getElementById("query").disabled=true;
+	document.getElementById("remove").disabled=true; 
+	document.getElementById("clear").disabled=true; 
+	document.getElementById("default-graph").disabled=false;
+	document.getElementById("random-graph").disabled=false;
+
+	
+	if (sn != undefined) {
+		sn.graph.clearGraph();
+		naive.graph.clearGraph();
+		es.graph.clearGraph();
+		spork.graph.clearGraph();
+	}
+
+	sn = undefined;
+	naive = undefined;
+	es = undefined;
+	spork = undefined;
+	nodesWithoutEdges = {};
 }
 
 function createAllGraphs(nodes, edges) { 
@@ -52,6 +76,7 @@ function createAllGraphs(nodes, edges) {
 
 	// disable random and default buttons, enable edge add and preprocess.
 	document.getElementById("preprocess").disabled=false;
+	document.getElementById("clear").disabled=false;
 	document.getElementById("add-node").disabled=false;
 	document.getElementById("add-edge").disabled=false;
 	document.getElementById("default-graph").disabled=true;
@@ -64,38 +89,96 @@ function addNode() {
  		createAllGraphs([], []);
  	}
  	var id = sn.graph.nextNodeId(); // will be the same for all of them
- 	sn.graph.addNode(id, id)
- 	naive.graph.addNode(id, id)
- 	es.graph.addNode(id, id)
- 	spork.graph.addNode(id, id)
+
+ 	// turn off the preprocess button until an edge is added, as it is not yet a valid tree
+	document.getElementById("preprocess").disabled=true;
+	nodesWithoutEdges[id] = true;
+
+ 	sn.graph.addNode(id, id);
+ 	naive.graph.addNode(id, id);
+ 	es.graph.addNode(id, id);
+ 	spork.graph.addNode(id, id);
 }
 
 function addEdge() {
 	var vert1 = document.getElementById('edge-from-create').value
 	var vert2 = document.getElementById('edge-to-create').value
+
+	if (sn.query(vert1, vert2)) return; // there is a path between the vertices, adding an edge would cause a cycle
+
 	var id = sn.graph.nextEdgeId(); // will be the same for all of them
 	sn.graph.addEdge(id, vert1, vert2)
  	naive.graph.addEdge(id, vert1, vert2)
  	es.graph.addEdge(id, vert1, vert2)
  	spork.graph.addEdge(id, vert1, vert2)
 
+ 	if (vert1 in nodesWithoutEdges) delete nodesWithoutEdges[vert1];
+ 	if (vert2 in nodesWithoutEdges) delete nodesWithoutEdges[vert2];
+
+ 	// enable the preprocess button if it is a valid tree (i.e. connected)
+ 	if (Object.keys(nodesWithoutEdges).length === 0)
+ 		document.getElementById("preprocess").disabled=false;
+
 }
+
+/**
+ * http://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 
 // not yet implemented 
 function randomGraph() {
-	// random number of nodes between 1 and 15
-	var numNodes = Math.floor((Math.random() * 10) + 5);
+	// random number of nodes between 5 and 15
+	var numNodes = getRandomInt(5, 15);
 	var nodes = [];
-	for (n in numNodes) {
-		id = (n+1).toString()
-		nodes.push({id: id, label: id})
+	for (var n=0; n < numNodes; n++) {
+		var id = (n+1).toString();
+		nodes.push({id: id, label: id});
 	}
-	var edges = [];
+	var root = nodes[0].id;
+	var seen = [root];
+	var indicies = [];
 	for (var n=1; n < numNodes; n++) {
-		id = (n+1).toString()
-		nodes.push({id: id, label: id})
+		indicies.push(n);
 	}
-	return {nodes: nodes, edges: edges}
+	shuffle(indicies);
+	var edges = [];
+	var id = 1;
+	for (var i in indicies) {
+		if (id.length > 1 && id[0] === 0) id.splice(0,1);
+		var v1 = seen[getRandomInt(0,seen.length-1)];
+		var v2 = nodes[indicies[i]].id;
+		edges.push({id: id.toString(), from: v1, to: v2})
+		seen.push(v2);
+		id++;
+	}
+
+	createAllGraphs(nodes, edges);
 }
 
 function initializeDataStructures() {
@@ -103,22 +186,25 @@ function initializeDataStructures() {
 }
 
 function query() {
-	console.log('query')
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
-	console.log('got values')
+
+	// if not in graph, do nothing. 
+	if (!sn.graph.containsNode(vert1) || !sn.graph.containsNode(vert2)) {
+		if (!sn.graph.containsNode(vert1)) console.log('1 not in graph');
+		if (!sn.graph.containsNode(vert2)) console.log('2 not in graph');
+		return;
+	}
+
 	var result = sn.query(vert1, vert2);
-	console.log('sn')
 	naive.query(vert1, vert2);
-	console.log('naive')
 	es.query(vert1, vert2);
-	console.log('es')
 	spork.query(vert1, vert2);
-	console.log('spork')
-	
+
 	console.log(result);
 	document.getElementById('query-result').innerHTML = result;
 	document.getElementById("query").disabled=true;
+	document.getElementById("clear").disabled=true;
 	document.getElementById("remove").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
@@ -134,6 +220,7 @@ function preprocess() {
 	es.preprocess();
 	spork.preprocess();
 	document.getElementById("preprocess").disabled=true;
+	document.getElementById("clear").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
 	console.log(pause)
@@ -144,12 +231,18 @@ function preprocess() {
 function deleteEdge() {
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
+
+	if (!sn.graph.containsEdge(vert1,vert2)) {
+		return;
+	}
+
 	sn.deleteEdge(vert1, vert2);
 	naive.deleteEdge(vert1, vert2);
 	es.deleteEdge(vert1, vert2);
 	spork.deleteEdge(vert1, vert2);
 	document.getElementById("query").disabled=true;
 	document.getElementById("remove").disabled=true;
+	document.getElementById("clear").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
 	highlight();
@@ -159,6 +252,7 @@ function highlight() {
 	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && spork.animationQueue.length == 0 && es.animationQueue.length == 0) {
 		document.getElementById("query").disabled=false;
 		document.getElementById("remove").disabled=false;
+		document.getElementById("clear").disabled=false;
 		return;
 	}
 	

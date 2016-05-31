@@ -82,9 +82,9 @@ input {
 
 .create-graph {
   	position:absolute;
-	width:700px;
-	height:60px;
-	margin-left:-250px;
+	width:750px;
+	height:40px;
+	margin-left:-375px;
 	bottom:0px;
 	left:50%;
 }
