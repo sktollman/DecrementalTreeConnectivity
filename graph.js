@@ -138,7 +138,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	this.updateLabelText = function(id, addition) {
 		this.nodes.update({
 			id: id,
-			label: this.nodes.get(id).label + ',' + addition
+			label: this.nodes.get(id).label + ', ' + addition
 		});
 	}
 

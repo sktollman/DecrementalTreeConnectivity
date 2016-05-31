@@ -178,7 +178,7 @@ var AlstrupSecherSpork = function(graph) {
 					// highlight label, change, unhighlight 
 					this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
 					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, clus.pathwords[nbor].toString()]}); 
-					this.animationQueue.push({func: this.graph.unhlighlightLabel, that: this.graph, args: [nbor]}); 
+					this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
 
 				}
 
@@ -188,6 +188,11 @@ var AlstrupSecherSpork = function(graph) {
 			// FIGURE OUT HOW TO REPRESENT THIS 
 			//set up the bitvector edgeWord with 1s for edges that exist
 			clus.edgeWord = (1 << clus.microEdges.length) - 1;
+			var nbor = clus.boundaries[0];
+			this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
+			this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, intToBitString(clus.edgeWord)]}); 
+			this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
+
 		}
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
 
@@ -273,5 +278,5 @@ var AlstrupSecherSpork = function(graph) {
     	var result = (value >>> 0).toString(2);
     	while (result.length < 8) result = '0' + result;
     	return result;
-	}
+	};
 };
