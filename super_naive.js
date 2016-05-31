@@ -10,13 +10,11 @@ var SuperNaive = function(graph) {
 		//DFS over vert1's component looking for vert2
 		var stack = [vert1];
 		var searched = [];
-
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
-
 		while (stack.length > 0) {
 			var curr = stack.pop();
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
-			searched.push[curr];
+			searched.push(curr);
 			if (curr === vert2) {
 				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#00FF00', '#32CD32']}); // green
 				return true;

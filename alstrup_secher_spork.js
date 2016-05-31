@@ -140,6 +140,7 @@ var AlstrupSecherSpork = function(graph) {
 		//make macro representation
 		this.macroGraph = new Graph("", macroNodes, macroEdges);
 		this.macroESRepr = new EvenShiloach(this.macroGraph);
+		this.macroESRepr.preprocess();
 
 		//make micro representations for each cluster
 		for(var c in this.clusters){
@@ -203,41 +204,75 @@ var AlstrupSecherSpork = function(graph) {
 	//query connectivity in the macro graph
 	this.macroquery = function(macVert1, macVert2){
 		return this.macroESRepr.query(macVert1, macVert2);
+		// maybe put this on the screen too 
 	};
 	//query connectivity in a micro graph
 	this.microquery = function(micVert1, micVert2){
 		var cluster = this.clusterMap[micVert1];
+
+		console.log(micVert1)
+		console.log(this.clusterMap)
+
+		// highlight both nodes
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert1, '#e60000', '#990000']}); // red
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert2, '#e60000', '#990000']}); // red
 		return (((cluster.pathWords[micVert1] ^ cluster.pathWords[micVert2]) & ~cluster.edgeWord) === 0);
 	};
 
 	//O(1)
 	this.query = function(vert1, vert2) {
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+        
 		// 
 
 		var clu1 = this.clusterMap[vert1];
 		var clu2 = this.clusterMap[vert2];
+		// highlight both in yellow 
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#ffff00', '#ffd700']}); // yellow
+		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#ffff00', '#ffd700']}); // yellow
+
 		//if they're in the same cluster, just check the micro connectivity
 		if (clu1 === clu2) {
 			return this.microquery(vert1, vert2);
+			// green if return true
+			if (this.microquery(vert1, vert2)) {
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#00FF00', '#32CD32']}); // green
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#00FF00', '#32CD32']}); // green
+				return true;
+			}
+			return false;
 		}
 		//otherwise, check the boundary nodes each inner vert can get to
 		var boundaries1 = [];
-		for (var vert in clu1.boundaries) {
+		for (var v in clu1.boundaries) {
+			var vert = clu1.boundaries[v]
 			if (this.microquery(vert1, vert)) {
 				boundaries1.push(vert);
+				// purple
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert, '#AB82FF', '#8A2BE2']}); 
 			}
 		}
 		var boundaries2 = [];
-		for (var vert in clu2.boundaries) {
+		for (var v in clu2.boundaries) {
+			var vert = clu2.boundaries[v]
 			if (this.microquery(vert2, vert)) {
 				boundaries2.push(vert);
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert, '#AB82FF', '#8A2BE2']}); 
 			}
 		}
 		//check the boundary nodes we found for macro connectivity
-		for (var macVert1 in boundaries1) {
-			for (var macVert2 in boundaries2) {
-				if (this.macroquery(macVert1, macVert2))
+		for (var v1 in boundaries1) {
+			for (var v2 in boundaries2) {
+				var macVert1 = boundaries1[v1];
+				var macVert2 = boundaries2[v2]
+				if (this.macroquery(macVert1, macVert2)) {
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [macVert1, '#00FF00', '#32CD32']}); // green
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [macVert2, '#00FF00', '#32CD32']}); // green
+				
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#00FF00', '#32CD32']}); // green
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#00FF00', '#32CD32']}); // green
 					return true;
+				}
 			}
 		}
 		return false;
@@ -264,6 +299,11 @@ var AlstrupSecherSpork = function(graph) {
 		if(cluster === this.clusterMap[vert2]){
 			var edgeInd = cluster.microEdges.findIndex(function(edge){return (vert1 in edge && vert2 in edge)});
 			cluster.edgeWord &= ~(1 << edgeInd);
+			var nbor = clus.boundaries[0];
+			this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
+			this.animationQueue.push({func: this.graph.updateMacroBit, that: this.graph, args: [nbor, intToBitString(cluster.edgeWord)]}); 
+			this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
+
 			var bounds = cluster.boundaries;
 			if(bounds.length === 2){
 				if(this.macroquery(bounds[0], bounds[1]) && !this.microquery(bounds[0], bounds[1])){

@@ -142,6 +142,17 @@ var Graph = function(container, nodes_param, edges_param) {
 		});
 	}
 
+	this.updateMacroBit = function(id, bitstring) {
+		var arr = this.nodes.get(id).split(", ");
+		var label = arr[0] 
+		if (arr.length == 3) label += ', ' + arr[1];
+		label += ', ' + bitstring;
+		this.nodes.update({
+			id: id,
+			label: label
+		});
+	}
+
 	this.enlargeEdge = function(from, to) {
 		var fromTo = from + to
 		var id = this.edgeToId[fromTo];

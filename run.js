@@ -103,12 +103,18 @@ function initializeDataStructures() {
 }
 
 function query() {
+	console.log('query')
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
+	console.log('got values')
 	var result = sn.query(vert1, vert2);
+	console.log('sn')
 	naive.query(vert1, vert2);
+	console.log('naive')
 	es.query(vert1, vert2);
-	//spork.query();
+	console.log('es')
+	spork.query(vert1, vert2);
+	console.log('spork')
 	
 	console.log(result);
 	document.getElementById('query-result').innerHTML = result;
@@ -141,7 +147,7 @@ function deleteEdge() {
 	sn.deleteEdge(vert1, vert2);
 	naive.deleteEdge(vert1, vert2);
 	es.deleteEdge(vert1, vert2);
-	//spork.deleteEdge();
+	spork.deleteEdge(vert1, vert2);
 	document.getElementById("query").disabled=true;
 	document.getElementById("remove").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
