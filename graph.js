@@ -231,8 +231,7 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	this.containsEdge = function(from, to) {
 		var fromTo = from + to
-		var id = this.edgeToId[fromTo];
-		return (this.edges.get(id) != undefined);
+		return (this.edgeToId[fromTo] != undefined);
 	};
 
 	this.clearGraph = function(id) {
@@ -270,11 +269,14 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	this.removeEdge = function(from, to) {
 		var fromTo = from + to;
+		var toFrom = to + from;
 		this.edges.remove({id: this.edgeToId[fromTo]});
 		var index = this.neighbors[from].indexOf(to);
 		this.neighbors[from].splice(index, 1);
 		var index = this.neighbors[to].indexOf(from);
 		this.neighbors[to].splice(index, 1);
+		delete this.edgeToId[fromTo];
+		delete this.edgeToId[toFrom];
 	};
 
 	this.draw = function() {
