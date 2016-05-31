@@ -74,8 +74,9 @@ def test_models(ms, ns):
 
 
 def graph():
-    ms = [10*(i+1) for i in range(2)]
-    ns = [i for i in ms]
+    ratio = 100
+    ns = [100*(i+1) for i in range(10)]
+    ms = [i * ratio for i in ns]
     p_times, q_times, d_times = test_models(ms, ns)
     for i in range(19):
         p_times2, q_times2, d_times2 = test_models(ms, ns)
@@ -83,72 +84,74 @@ def graph():
         q_times = [[a + b for a, b in zip(l1, l2)] for l1, l2 in zip(q_times, q_times2)]
         d_times = [[a + b for a, b in zip(l1, l2)] for l1, l2 in zip(d_times, d_times2)]
 
-    for i in range(4):
-        plt.plot(ns, [t*500000 for t in p_times[i]])
-    plt.title('Preprocessing Time vs. Graph Size, m = n')
-    plt.xlabel('Graph Size')
-    plt.ylabel('Preprocessing Time (microsecs)')
-    plt.legend(['Uns.', 'DFS', 'E-S', 'A-S-S'], 'upper left')
-    plt.savefig("ptimes_meqn.png")
-    plt.show()
+    # for i in range(4):
+    #     plt.plot(ns, [t*500 for t in p_times[i]])
+    # plt.title('Preprocessing Time vs. Graph Size')
+    # plt.xlabel('Graph Size')
+    # plt.ylabel('Preprocessing Time (ms)')
+    # plt.legend(['Unstructured', 'DFS Labeling', 'Even Shiloach', 'Alstrup Secher Spork'], 'upper left')
+    # plt.savefig("ptimes_meq" + str(ratio) + "n.png")
+    # plt.show()
 
-    plt.clf()
-    for i in range(4):
-        plt.plot(ns, [t*500000 for t in q_times[i]])
-    plt.title('Total Query Time vs. Graph Size, m = n')
-    plt.xlabel('Graph Size')
-    plt.ylabel('Total Query Time (microsecs)')
-    plt.legend(['Uns.', 'DFS', 'E-S', 'A-S-S'], 'upper left')
-    plt.savefig("qtimes_meqn.png")
-    plt.show()
+    # plt.clf()
+    # for i in range(4):
+    #     plt.plot(ns, [t*500 for t in q_times[i]])
+    # plt.title('Total Query Time vs. Graph Size')
+    # plt.xlabel('Graph Size')
+    # plt.ylabel('Total Query Time (ms)')
+    # plt.legend(['Unstructured', 'DFS Labeling', 'Even Shiloach', 'Alstrup Secher Spork'], 'upper left')
+    # plt.savefig("qtimes_meq" + str(ratio) + "n.png")
+    # plt.show()
 
-    plt.clf()
+    # plt.clf()
+    # for i in range(4):
+    #     plt.plot(ns, [t*500 for t in d_times[i]])
+    # plt.title('Total Delete Time vs. Graph Size')
+    # plt.xlabel('Graph Size')
+    # plt.ylabel('Total Delete Time (ms)')
+    # plt.legend(['Unstructured', 'DFS Labeling', 'Even Shiloach', 'Alstrup Secher Spork'], 'upper left')
+    # plt.savefig("dtimes_meq" + str(ratio) + "n.png")
+    # plt.show()
+
+    # plt.clf()
     for i in range(4):
-        plt.plot(ns, [t*500000 for t in d_times[i]])
-    plt.title('Total Delete Time vs. Graph Size, m = n')
+        t_times = [p+q+d for p, (q, d) in zip(p_times[i], zip(q_times[i], d_times[i]))]
+        plt.plot(ns, [t*500 for t in t_times])
+    plt.title('Total Operation Time vs. Graph Size, m = 100n')
     plt.xlabel('Graph Size')
-    plt.ylabel('Total Delete Time (microsecs)')
-    plt.legend(['Uns.', 'DFS', 'E-S', 'A-S-S'], 'upper left')
-    plt.savefig("dtimes_meqn.png")
+    plt.ylabel('Total Operation Time (ms)')
+    plt.legend(['Unstructured', 'DFS Labeling', 'Even Shiloach', 'Alstrup Secher Spork'], 'upper left')
+    plt.savefig("times_meq" + str(ratio) + "n.png")
     plt.show()
 
 
 def test_graphs():
-    n, m = 20, 20
-    graphs = random_graph_copies(n, copies=6)
-    type_list = [AlstrupSecherSpork]  # [DFSLabeling, EvenShiloach, AlstrupSecherSpork]
+    n_trials = 100
+    n, m = 100, 100
+
+    type_list = [DFSLabeling, EvenShiloach, AlstrupSecherSpork]
     for i, model_type in enumerate(type_list):
-        g_model = Unstructured(graphs[i])
-        t_model = model_type(graphs[i+3])
+        for j in range(n_trials):
+            graphs = random_graph_copies(n, copies=2)
+            g_model = Unstructured(graphs[0])
+            t_model = model_type(graphs[1])
 
-        verts = g_model.graph.getVertices()
-        seq = [True] * m + [False] * (n - 1)
-        shuffle(seq)
-        edges = [e for e in g_model.graph.getEdges()]
-        shuffle(edges)
+            verts = g_model.graph.getVertices()
+            seq = [True] * m + [False] * (n - 1)
+            shuffle(seq)
+            edges = [e for e in g_model.graph.getEdges()]
+            shuffle(edges)
 
-        for op in seq:
-            if op:
-                print 'QUERY'
-                v1, v2 = choice(verts), choice(verts)
-                print g_model.graph.getVertices(), g_model.graph.getEdges()
-                print v1, v2
-                g_res = g_model.query(v1, v2)
-                t_res = t_model.query(v1, v2)
-                print model_type, g_res, t_res
-                assert g_res == t_res
-                print '-' * 100
-            else:
-                print 'DELETE'
-                v1, v2 = edges.pop()
-                print g_model.graph.getVertices(), g_model.graph.getEdges()
-                print v1, v2
-                g_model.delete_edge(v1, v2)
-                t_model.delete_edge(v1, v2)
-                print g_model.graph.getVertices(), g_model.graph.getEdges()
-                print '-' * 100
+            for op in seq:
+                if op:
+                    v1, v2 = choice(verts), choice(verts)
+                    g_res = g_model.query(v1, v2)
+                    t_res = t_model.query(v1, v2)
+                    assert g_res == t_res
+                else:
+                    v1, v2 = edges.pop()
+                    g_model.delete_edge(v1, v2)
+                    t_model.delete_edge(v1, v2)
 
 
-test_graphs()
-
-# graph()
+graph()

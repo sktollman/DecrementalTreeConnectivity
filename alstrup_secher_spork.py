@@ -51,9 +51,12 @@ class AlstrupSecherSpork(Model):
                 macro_verts.append(bound)
                 nbors = self.graph.getNeighbors(bound)
                 for nbor in nbors:
-                    if self.clusterMap[nbor] != clus or nbor in clus['bounds']:
+                    if self.clusterMap[nbor] != clus:
                         if nbor > bound:
                             macro_edges.append((bound, nbor))
+                for nbor in clus['bounds']:
+                    if nbor > bound:
+                        macro_edges.append((bound, nbor))
 
         self.macroGraph = Graph(macro_verts, macro_edges)
         self.macroESRepr = EvenShiloach(self.macroGraph)
@@ -135,7 +138,7 @@ class AlstrupSecherSpork(Model):
         vert1s = self.graph.getGroup(vert1)
         for p_vert1 in vert1s:
             for p_vert2 in self.graph.getNeighbors(p_vert1):
-                if :
+                if p_vert2.split('_')[0] == vert2:
                     vert1, vert2 = p_vert1, p_vert2
                     break
             else:
@@ -150,3 +153,7 @@ class AlstrupSecherSpork(Model):
             edge_map = clus['microEdges']
             edge_ind = edge_map[(vert1, vert2)] if (vert1, vert2) in edge_map else edge_map[(vert2, vert1)]
             clus['edgeWord'] &= ~(1 << edge_ind)
+            bounds = clus['bounds']
+            if len(bounds) == 2:
+                if self.macroquery(bounds[0], bounds[1]) and not self.microquery(bounds[0], bounds[1]):
+                    self.macroESRepr.delete_edge(bounds[0], bounds[1])
