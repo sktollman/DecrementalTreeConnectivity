@@ -28,6 +28,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	for (var n in nodes_param) {
 		this.neighbors[nodes_param[n].id] = new Array();
 	}
+	
 	for (var e in edges_param) {
 		this.neighbors[edges_param[e].from].push(edges_param[e].to);
 		this.neighbors[edges_param[e].to].push(edges_param[e].from);
@@ -41,6 +42,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.getNeighbors = function(id) {
+		console.log(id)
 		return this.neighbors[id];
 	};
 

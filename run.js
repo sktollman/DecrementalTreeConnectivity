@@ -2,6 +2,40 @@
 document.getElementById("query").disabled=true;
 document.getElementById("remove").disabled=true; var delay = 200 // make slider
 
+function defaultGraph() {
+	var nodes = [
+			{id: '1', label: '1'},
+			{id: '2', label: '2'},
+			{id: '3', label: '3'},
+			{id: '4', label: '4'},
+			{id: '5', label: '5'}
+			];
+	var edges = [
+				{id: '1', from: '1', to: '2'},
+				{id: '2', from: '1', to: '3'},
+				{id: '3', from: '2', to: '4'},
+				{id: '4', from: '2', to: '5'}
+				];
+
+	return {nodes: nodes, edges: edges}		
+}
+
+function randomGraph() {
+	// random number of nodes between 1 and 15
+	var numNodes = Math.floor((Math.random() * 10) + 5);
+	var nodes = [];
+	for (n in numNodes) {
+		id = (n+1).toString()
+		nodes.push({id: id, label: id})
+	}
+	var edges = [];
+	for (var n=1; n < numNodes; n++) {
+		id = (n+1).toString()
+		nodes.push({id: id, label: id})
+	}
+	return {nodes: nodes, edges: edges}
+}
+
 function query() {
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value

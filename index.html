@@ -26,7 +26,7 @@
 				<h1 class="title">Unstructured</h1>
 			</td>
 			<td>
-				<h1 class="title">Naive</h1>
+				<h1 class="title">DFS Labeling</h1>
 			</td>
 		</tr>
 		<tr>
@@ -86,11 +86,11 @@
 			<h2 class="control-title">Controls</h2>
 			<table class="control-table">
 				<tr>
-					<td class="control-cell"><label for="edge-from" class="fromto">Vertex 1</label></td>
+					<td class="control-cell"><label for="edge-from" class="fromto">Node 1</label></td>
 					<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
 				</tr>
 				<tr>
-					<td class="control-cell"><label for="edge-to" class="fromto">Vertex 2</label></td>
+					<td class="control-cell"><label for="edge-to" class="fromto">Node 2</label></td>
 					<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
 				</tr>
 				<tr>
@@ -139,6 +139,39 @@
 				</tr>
 			</table>
 		</div>
+	</div>
+	<div class="create-graph">
+		<h3 class="control-title">Create Tree</h3>
+		<button id="default-graph" class="control-button" onclick="query();">Use Default</button>
+		<button id="random-graph" class="control-button" onclick="query();">Random Graph</button>
+		<button id="random-graph" class="control-button" onclick="query();">Add Node</button>
+		<tr>
+			<td class="control-cell"><label for="edge-from" class="fromto">Node 1</label></td>
+			<td class="control-cell"><input id="edge-from" type="text" value="1"></td>
+		</tr>
+		<tr>
+			<td class="control-cell"><label for="edge-to" class="fromto">Node 2</label></td>
+			<td class="control-cell"><input id="edge-to" type="text" value="2"></td>
+		</tr>
+		<button id="default-graph" class="control-button" onclick="query();">Add Edge</button>
+		<!--table class="key-table">
+			<tr>
+				<td bgcolor="#e60000" class="key-cell"></td>
+				<td class="key-description">Current node</td>
+			</tr>
+			<tr>
+				<td bgcolor="#ffff00" class="key-cell"></td>
+				<td class="key-description">Enqueued</td>
+			</tr>
+			<tr>
+				<td bgcolor="#878787" class="key-cell"></td>
+				<td class="key-description">Searched</td>
+			</tr>
+			<tr>
+				<td bgcolor="#00FF00" class="key-cell"></td>
+				<td class="key-description">Found</td>
+			</tr>
+		</table-->
 	</div>
 	<script type="text/javascript" src="run.js"></script>
 

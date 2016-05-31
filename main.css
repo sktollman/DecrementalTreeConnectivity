@@ -76,7 +76,15 @@ input {
 }
 
 .network {
-	height: 40vh;
-	width: 400px;
+	height: 38vh;
+	width: 40vw;
 }
 
+.create-graph {
+  	position:absolute;
+	width:500px;
+	height:60px;
+	margin-left:-250px;
+	bottom:0px;
+	left:50%;
+}

@@ -24,7 +24,7 @@ var AlstrupSecherSpork = function(graph) {
 		//add the cluster to the map
 		this.clusterMap[node] = null;
 		var clus = [node];
-		var neighbors = this.graph.getNeighbors(node.id);
+		var neighbors = this.graph.getNeighbors(node);
 		var deg = neighbors.length;
 		var sz = 1;
 		for(var n in neighbors){
@@ -52,21 +52,24 @@ var AlstrupSecherSpork = function(graph) {
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#e60000', '#990000']}); // red
 			var nbors = this.graph.getNeighbors(node);
 			var deg = nbors.length;
-	  	if(deg <= 3) continue;
-	    this.graph.removeNode(node); //I assume this removes edges incident to node as well
-	    var prevV = null;
-	    for(var j in nbors){
-	    	var nbor = nbors[j];
-	    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
-	    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
-		    this.graph.addNode(nbor, nbor);
-		    if (prevV != null) {
-		    	this.graph.addEdge(currV, prevV);
+		  	if(deg <= 3) {
+		  		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
+		  		continue;
+		  	}
+		    this.graph.removeNode(node); //I assume this removes edges incident to node as well
+		    var prevV = null;
+		    for(var j in nbors){
+		    	var nbor = nbors[j];
+		    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
+		    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
+			    this.graph.addNode(nbor, nbor);
+			    if (prevV != null) {
+			    	this.graph.addEdge(currV, prevV);
+			    }
+			    this.graph.addEdge(currV, nbor);
+			    prevV = currV;
 		    }
-		    this.graph.addEdge(currV, nbor);
-		    prevV = currV;
-	    }
-	    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
+		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
 		}
 
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
@@ -78,16 +81,19 @@ var AlstrupSecherSpork = function(graph) {
 				break;
 			}
 		}
+
 		//cluster all of the nodes
-		this.addCluster(this.makeCluster(rt));
+		this.addCluster(this.makeCluster(rt.id));
 
 		//add boundary node information
 		for(var c in this.clusters){
 			var clus = this.clusters[c]
 			clus.boundaries = [];
-			for(var node in clus.nodes){
-				for(var nbor in this.graph.getNeighbors(node)){
-					if(this.clusterMap[nbor] !== clus){
+			for(var n in clus.nodes){
+				var node = clus.nodes[n]
+				var nbors = this.graph.getNeighbors(node)
+				for(var nbor in nbors){
+					if(this.clusterMap[nbors[nbor]] !== clus){
 						clus.boundaries.push(node);
 						// make that node bigger
 						break;
@@ -103,7 +109,6 @@ var AlstrupSecherSpork = function(graph) {
 		
 		for(var c in this.clusters){
 			var clus = this.clusters[c]
-			console.log(clus.boundaries)
 			for(var b in clus.boundaries){
 				var bound = clus.boundaries[b]
 				macroNodes.push({id: bound, label: bound});
@@ -111,17 +116,15 @@ var AlstrupSecherSpork = function(graph) {
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
-						macroEdges.push({id: edgenum, from: bound, to: nbor});
+						if (parseInt(bound) < parseInt(nbor)) macroEdges.push({id: edgenum, from: bound, to: nbor});
 						edgenum++;
 						// make this edge bigger
 					}
 				}
 			}
 		}
-		console.log(macroNodes)
-		console.log(macroEdges)
 		//make macro representation
-		this.macroGraph = new Graph(macroNodes, macroEdges);
+		this.macroGraph = new Graph("", macroNodes, macroEdges);
 		this.macroESRepr = new EvenShiloach(this.macroGraph);
 
 		//make micro representations for each cluster
@@ -153,7 +156,7 @@ var AlstrupSecherSpork = function(graph) {
 			}
 
 			//set up the bitvector edgeWord with 1s for edges that exist
-			clus.edgeWord = (1 << length(clus.microEdges)) - 1;
+			clus.edgeWord = (1 << clus.microEdges.length) - 1;
 		}
 	};
 
