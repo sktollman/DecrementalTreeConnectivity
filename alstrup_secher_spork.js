@@ -44,6 +44,26 @@ var AlstrupSecherSpork = function(graph) {
 		return {nodes:clus, degree:deg, size:sz};
 	};
 
+	this.addESQueue = function() {
+		var q = this.macroESRepr.animationQueue;
+		for (var i in q) {
+			var elem = q[i]
+			if (elem.func === this.macroESRepr.graph.highlightEdge || elem.func === this.macroESRepr.graph.removeEdge) {
+				continue;
+			}
+			if (elem.func === this.macroESRepr.graph.unhighlightAll) {
+				elem.func = this.graph.unhighlightES;
+				elem.args.push(this.macroESRepr.graph);
+			}
+			if (elem.func === this.macroESRepr.graph.updateNodeGroup) {
+				elem.func.apply(elem.that, elem.args)
+				elem.func = this.graph.updateESGroup;
+			}
+			elem.that = this.graph;
+			this.animationQueue.push(elem)
+		}
+	}
+
 	//O(n)
 	this.preprocess = function() {
 		//remake the graph such that all nodes have degree <= 3
@@ -142,6 +162,8 @@ var AlstrupSecherSpork = function(graph) {
 		this.macroESRepr = new EvenShiloach(this.macroGraph);
 		this.macroESRepr.preprocess();
 
+		this.addESQueue();
+
 		//make micro representations for each cluster
 		for(var c in this.clusters){
 			var clus = this.clusters[c]
@@ -196,6 +218,7 @@ var AlstrupSecherSpork = function(graph) {
 
 		}
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+		this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
 
 	};
 
@@ -203,7 +226,9 @@ var AlstrupSecherSpork = function(graph) {
 
 	//query connectivity in the macro graph
 	this.macroquery = function(macVert1, macVert2){
-		return this.macroESRepr.query(macVert1, macVert2);
+		var result = this.macroESRepr.query(macVert1, macVert2);
+		this.addESQueue();
+		return result;
 		// maybe put this on the screen too 
 	};
 	//query connectivity in a micro graph
@@ -222,7 +247,7 @@ var AlstrupSecherSpork = function(graph) {
 	//O(1)
 	this.query = function(vert1, vert2) {
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
-        
+        this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
 		// 
 
 		var clu1 = this.clusterMap[vert1];
@@ -285,6 +310,7 @@ var AlstrupSecherSpork = function(graph) {
 		// print bit representations. 
 		// change bit representation
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+		this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
         this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
         this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
@@ -292,6 +318,7 @@ var AlstrupSecherSpork = function(graph) {
 		var outerVerts = this.macroGraph.getVertices();
 		if(vert1 in outerVerts && vert2 in outerVerts){
 			this.macroESRepr.deleteEdge(vert1, vert2);
+			this.addESQueue();
 		}
 
 		//find the cluster and delete there
@@ -308,6 +335,7 @@ var AlstrupSecherSpork = function(graph) {
 			if(bounds.length === 2){
 				if(this.macroquery(bounds[0], bounds[1]) && !this.microquery(bounds[0], bounds[1])){
 					this.macroESRepr.deleteEdge(bounds[0], bounds[1]);
+					this.addESQueue();
 				}
 			}
 		}
