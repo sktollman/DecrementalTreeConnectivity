@@ -13,32 +13,26 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	var nodeBackgroundColor = '#EEE9E9'
 
-	// default values
-	if (nodes_param == undefined) nodes_param = [
-			{id: '1', label: '1'},
-			{id: '2', label: '2'},
-			{id: '3', label: '3'},
-			{id: '4', label: '4'},
-			{id: '5', label: '5'}
-			];
-	if (edges_param == undefined) edges_param = [
-				{id: '1', from: '1', to: '2'},
-				{id: '2', from: '1', to: '3'},
-				{id: '3', from: '2', to: '4'},
-				{id: '4', from: '2', to: '5'}
-				];
-
 	this.network = {};
 	this.container = container;
 	this.edges = new vis.DataSet(edges_param);
 	this.nodes = new vis.DataSet(nodes_param);
 
+	this.edgeId = 0;
+	this.nodeId = 0;
+
 	this.neighbors = {};
 	for (var n in nodes_param) {
+		asInt = parseInt(nodes_param[n].id);
+		if (asInt > this.nodeId) this.nodeId = asInt
+
 		this.neighbors[nodes_param[n].id] = new Array();
 	}
 	
 	for (var e in edges_param) {
+		asInt = parseInt(edges_param[e].id);
+		if (asInt > this.edgeId) this.edgeId = asInt
+
 		this.neighbors[edges_param[e].from].push(edges_param[e].to);
 		this.neighbors[edges_param[e].to].push(edges_param[e].from);
 	}
@@ -50,11 +44,20 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.edgeToId[fromTo] = edge.id;
 		var toFrom = edge.to + edge.from;
 		this.edgeToId[toFrom] = edge.id;
-	};
+	}
 
 	this.getNeighbors = function(id) {
-		console.log(id)
 		return this.neighbors[id];
+	};
+
+	this.nextNodeId = function() {
+		this.nodeId++;
+		return this.nodeId.toString();
+	};
+
+	this.nextEdgeId = function() {
+		this.edgeId++;
+		return this.edgeId.toString();
 	};
 
 	this.addNode = function(id, label) {
@@ -62,6 +65,7 @@ var Graph = function(container, nodes_param, edges_param) {
 			id: id,
 			label: label
 		});
+		this.neighbors[id] = new Array();
 	};
 
 	this.updateNodeGroup = function(id, groupNum) {
@@ -114,6 +118,29 @@ var Graph = function(container, nodes_param, edges_param) {
 			
 		}
 	};
+
+	this.updateLabelColor = function(id, color) {
+		this.nodes.update({
+			id: id,
+			font: {
+				color: color
+			}
+		});
+	}
+
+	this.unhighlightLabel = function(id) {
+		this.nodes.update({
+			id: id,
+			font: null
+		});
+	}
+
+	this.updateLabelText = function(id, addition) {
+		this.nodes.update({
+			id: id,
+			label: this.nodes.get(id).label + ',' + addition
+		});
+	}
 
 	this.enlargeEdge = function(from, to) {
 		var fromTo = from + to
@@ -169,11 +196,18 @@ var Graph = function(container, nodes_param, edges_param) {
 
 
 	this.addEdge = function(id, from, to) {
+		if (!(to in this.neighbors) || !(from in this.neighbors)) return;
 		this.edges.add({
 			id: id,
 			from: from,
 			to: to
 		});
+		this.neighbors[from].push(to);
+		this.neighbors[to].push(from);
+		var fromTo = from + to;
+		this.edgeToId[fromTo] = id;
+		var toFrom = to + from;
+		this.edgeToId[toFrom] = id;
 	};
 
 

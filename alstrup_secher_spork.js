@@ -152,29 +152,48 @@ var AlstrupSecherSpork = function(graph) {
 			var stack = [clus.boundaries[0]];
 			var searched = [];
 
+			// highlight label, change, unhighlight 
+			var nbor = clus.boundaries[0];
+			this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
+			this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, intToBitString(0)]}); 
+			this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
+
+
 			// DFS COLORING
 			while(stack.length > 0){
 				var curr = stack.pop();
-				//this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
 				searched.push[curr];
 				var neighbors = this.graph.getNeighbors(curr)
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(nbor in searched || this.clusterMap[nbor] !== clus) continue;
-					//this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
+					this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
 					//add edge to lists
 					stack.push(nbor);
 					clus.microEdges.push([curr, nbor]);
 					//keep track of root->nbor path for each one
-					var newEdgeInd = length(clus.microEdges) - 1;
+					var newEdgeInd = clus.microEdges.length - 1;
 					clus.pathWords[nbor] = clus.pathWords[curr] | (1 << newEdgeInd);
+					// highlight label, change, unhighlight 
+					this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
+					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, clus.pathwords[nbor].toString()]}); 
+					this.animationQueue.push({func: this.graph.unhlighlightLabel, that: this.graph, args: [nbor]}); 
+
 				}
+
+				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#878787', '#696969']}); // grey
 			}
 
+			// FIGURE OUT HOW TO REPRESENT THIS 
 			//set up the bitvector edgeWord with 1s for edges that exist
 			clus.edgeWord = (1 << clus.microEdges.length) - 1;
 		}
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+
 	};
+
+
 
 	//query connectivity in the macro graph
 	this.macroquery = function(macVert1, macVert2){
@@ -225,6 +244,9 @@ var AlstrupSecherSpork = function(graph) {
 		// use queue from macro es to color dfs over boundaries 
 		// print bit representations. 
 		// change bit representation
+		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+        this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
+        this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
 		//if it's a macroedge, delete it in the macrograph
 		var outerVerts = this.macroGraph.getVertices();
@@ -245,4 +267,11 @@ var AlstrupSecherSpork = function(graph) {
 			}
 		}
 	};
+
+	// http://stackoverflow.com/questions/9939760/how-do-i-convert-an-integer-to-binary-in-javascript
+	function intToBitString(value) {
+    	var result = (value >>> 0).toString(2);
+    	while (result.length < 8) result = '0' + result;
+    	return result;
+	}
 };
