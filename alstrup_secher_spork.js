@@ -18,7 +18,6 @@ var AlstrupSecherSpork = function(graph) {
 			this.animationQueue.push({func: this.graph.updateNodeGroup, that: this.graph, args: [nodes[n], this.clusters.length+1]});
 		}
 		this.clusters.push(cluster);
-		console.log(this.clusters);
 	};
 	//recursively generate clusters as per Fredrickson
 	this.makeCluster = function(node) {
@@ -234,9 +233,6 @@ var AlstrupSecherSpork = function(graph) {
 	//query connectivity in a micro graph
 	this.microquery = function(micVert1, micVert2){
 		var cluster = this.clusterMap[micVert1];
-
-		console.log(micVert1)
-		console.log(this.clusterMap)
 
 		// highlight both nodes
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert1, '#e60000', '#990000']}); // red

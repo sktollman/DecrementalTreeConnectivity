@@ -8,7 +8,7 @@ var Naive = function(graph) {
 		this.connectivityMap = {};
 		var vertices = this.graph.getVertices()
 		for (var i in vertices) {
-			var start = vertices[i].id
+			var start = vertices[i].id;
 			//if this vertex has already been assigned a cluster, skip it
 			if (start in this.connectivityMap) continue;
 			//DFS from this node, assigning them all the same cluster number

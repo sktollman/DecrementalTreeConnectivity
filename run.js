@@ -121,21 +121,64 @@ function addEdge() {
 
 }
 
+/**
+ * http://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+
 // not yet implemented 
 function randomGraph() {
-	// random number of nodes between 1 and 15
-	var numNodes = Math.floor((Math.random() * 10) + 5);
+	// random number of nodes between 5 and 15
+	var numNodes = getRandomInt(5, 15);
 	var nodes = [];
-	for (n in numNodes) {
-		id = (n+1).toString()
-		nodes.push({id: id, label: id})
+	for (var n=0; n < numNodes; n++) {
+		var id = (n+1).toString();
+		nodes.push({id: id, label: id});
 	}
-	var edges = [];
+	var root = nodes[0].id;
+	var seen = [root];
+	var indicies = [];
 	for (var n=1; n < numNodes; n++) {
-		id = (n+1).toString()
-		nodes.push({id: id, label: id})
+		indicies.push(n);
 	}
-	return {nodes: nodes, edges: edges}
+	shuffle(indicies);
+	var edges = [];
+	var id = 1;
+	for (var i in indicies) {
+		if (id.length > 1 && id[0] === 0) id.splice(0,1);
+		var v1 = seen[getRandomInt(0,seen.length-1)];
+		var v2 = nodes[indicies[i]].id;
+		edges.push({id: id.toString(), from: v1, to: v2})
+		seen.push(v2);
+		id++;
+	}
+
+	createAllGraphs(nodes, edges);
 }
 
 function initializeDataStructures() {
@@ -143,12 +186,13 @@ function initializeDataStructures() {
 }
 
 function query() {
-	console.log('query')
 	var vert1 = document.getElementById('edge-from').value
 	var vert2 = document.getElementById('edge-to').value
 
 	// if not in graph, do nothing. 
 	if (!sn.graph.containsNode(vert1) || !sn.graph.containsNode(vert2)) {
+		if (!sn.graph.containsNode(vert1)) console.log('1 not in graph');
+		if (!sn.graph.containsNode(vert2)) console.log('2 not in graph');
 		return;
 	}
 

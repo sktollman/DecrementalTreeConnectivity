@@ -120,7 +120,6 @@ var Graph = function(container, nodes_param, edges_param) {
 	this.unhighlightES = function(esgraph) {
 		items = esgraph.nodes.get();
 		for (var i in items) {
-			console.log(this.nodes.get(items[i].id))
 			this.nodes.update({
 				id: items[i].id,
 				color:  {
@@ -227,13 +226,13 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.containsNode = function(id) {
-		return (id in this.nodes.get());
+		return (this.nodes.get(id) != undefined);
 	};
 
 	this.containsEdge = function(from, to) {
 		var fromTo = from + to
 		var id = this.edgeToId[fromTo];
-		return (id in this.edges.get());
+		return (this.edges.get(id) != undefined);
 	};
 
 	this.clearGraph = function(id) {

@@ -39,9 +39,6 @@ var EvenShiloach = function(graph) {
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#e60000', '#990000']}); // red
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#e60000', '#990000']}); // red
-		console.log(vert1)
-		console.log(vert2)
-		console.log(this.connectivityMap)
 		if (this.connectivityMap[vert1] === this.connectivityMap[vert2]) {
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert1, '#00FF00', '#32CD32']}); // green
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [vert2, '#00FF00', '#32CD32']}); // green
