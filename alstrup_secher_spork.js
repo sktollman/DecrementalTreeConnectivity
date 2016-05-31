@@ -47,7 +47,14 @@ var AlstrupSecherSpork = function(graph) {
 		var q = this.macroESRepr.animationQueue;
 		for (var i in q) {
 			var elem = q[i]
-			if (elem.func === this.macroESRepr.graph.highlightEdge || elem.func === this.macroESRepr.graph.removeEdge) {
+			console.log(elem)
+			if (elem.func === this.macroESRepr.graph.highlightEdge) {
+				continue;
+			} 
+			if (elem.func === this.macroESRepr.graph.removeEdge) {
+				console.log(this.macroESRepr.graph.nodes.get());
+				elem.func.apply(elem.that, elem.args);
+				console.log(this.macroESRepr.graph.nodes.get());
 				continue;
 			}
 			if (elem.func === this.macroESRepr.graph.unhighlightAll) {
@@ -55,7 +62,7 @@ var AlstrupSecherSpork = function(graph) {
 				elem.args.push(this.macroESRepr.graph);
 			}
 			if (elem.func === this.macroESRepr.graph.updateNodeGroup) {
-				elem.func.apply(elem.that, elem.args)
+				elem.func.apply(elem.that, elem.args);
 				elem.func = this.graph.updateESGroup;
 			}
 			elem.that = this.graph;
@@ -199,7 +206,7 @@ var AlstrupSecherSpork = function(graph) {
 					clus.pathWords[nbor] = clus.pathWords[curr] | (1 << newEdgeInd);
 					// highlight label, change, unhighlight 
 					this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [nbor, '#e60000']}); 
-					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, clus.pathWords[nbor].toString()]}); 
+					this.animationQueue.push({func: this.graph.updateLabelText, that: this.graph, args: [nbor, intToBitString(clus.pathWords[nbor].toString())]}); 
 					this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [nbor]}); 
 
 				}
@@ -313,8 +320,13 @@ var AlstrupSecherSpork = function(graph) {
         this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
         this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
+
 		//if it's a macroedge, delete it in the macrograph
-		var outerVerts = this.macroGraph.getVertices();
+		var macroVerts = this.macroESRepr.graph.nodes.get();
+		var outerVerts = {};
+		for (var i in macroVerts) {
+			outerVerts[macroVerts[i].id] = true;
+		}
 		if(vert1 in outerVerts && vert2 in outerVerts){
 			this.macroESRepr.deleteEdge(vert1, vert2);
 			this.addESQueue();
@@ -341,10 +353,13 @@ var AlstrupSecherSpork = function(graph) {
 			if(bounds.length === 2){
 				if(this.macroquery(bounds[0], bounds[1]) && !this.microquery(bounds[0], bounds[1])){
 					this.macroESRepr.deleteEdge(bounds[0], bounds[1]);
+					console.log('same2');
 					this.addESQueue();
 				}
 			}
 		}
+		this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
+        
 	};
 
 	// http://stackoverflow.com/questions/9939760/how-do-i-convert-an-integer-to-binary-in-javascript
