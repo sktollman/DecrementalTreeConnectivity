@@ -116,7 +116,7 @@ var AlstrupSecherSpork = function(graph) {
 				macroNodes.push({id: bound, label: bound});
 				var neighbors = this.graph.getNeighbors(bound)
 				for(var n in neighbors){
-					var nbor = neighbors[n]
+					var nbor = neighbors[n];
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
 						if (parseInt(bound) < parseInt(nbor)) {
 							macroEdges.push({id: edgenum, from: bound, to: nbor});
@@ -124,6 +124,15 @@ var AlstrupSecherSpork = function(graph) {
 							// make this edge bigger
 							this.animationQueue.push({func: this.graph.enlargeEdge, that: this.graph, args: [bound, nbor]});
 						}
+					}
+				}
+				for(var n in clus.boundaries){
+					var nbor = neighbors[n];
+					if (parseInt(bound) < parseInt(nbor)) {
+						macroEdges.push({id: edgenum, from: bound, to: nbor});
+						edgenum++;
+						// make this edge bigger
+						this.animationQueue.push({func: this.graph.enlargeEdge, that: this.graph, args: [bound, nbor]});
 					}
 				}
 			}
@@ -228,6 +237,12 @@ var AlstrupSecherSpork = function(graph) {
 		if(cluster === this.clusterMap[vert2]){
 			var edgeInd = cluster.microEdges.findIndex(function(edge){return (vert1 in edge && vert2 in edge)});
 			cluster.edgeWord &= ~(1 << edgeInd);
+			var bounds = cluster.boundaries;
+			if(bounds.length === 2){
+				if(this.macroquery(bounds[0], bounds[1]) && !this.microquery(bounds[0], bounds[1])){
+					this.macroESRepr.deleteEdge(bounds[0], bounds[1]);
+				}
+			}
 		}
 	};
 };
