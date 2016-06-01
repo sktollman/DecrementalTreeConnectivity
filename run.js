@@ -201,7 +201,6 @@ function query() {
 	es.query(vert1, vert2);
 	spork.query(vert1, vert2);
 
-	console.log(result);
 	document.getElementById('query-result').innerHTML = result;
 	document.getElementById("query").disabled=true;
 	document.getElementById("clear").disabled=true;
@@ -223,7 +222,6 @@ function preprocess() {
 	document.getElementById("clear").disabled=true;
 	pause = parseInt(document.getElementById("pause").value);
 	if (pause > 0) delay = pause;
-	console.log(pause)
 	highlight();
 	
 }

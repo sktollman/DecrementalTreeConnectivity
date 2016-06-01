@@ -47,14 +47,11 @@ var AlstrupSecherSpork = function(graph) {
 		var q = this.macroESRepr.animationQueue;
 		for (var i in q) {
 			var elem = q[i]
-			console.log(elem)
 			if (elem.func === this.macroESRepr.graph.highlightEdge) {
 				continue;
 			} 
 			if (elem.func === this.macroESRepr.graph.removeEdge) {
-				console.log(this.macroESRepr.graph.nodes.get());
 				elem.func.apply(elem.that, elem.args);
-				console.log(this.macroESRepr.graph.nodes.get());
 				continue;
 			}
 			if (elem.func === this.macroESRepr.graph.unhighlightAll) {
@@ -386,7 +383,6 @@ var AlstrupSecherSpork = function(graph) {
 			if(bounds.length === 2){
 				if(this.macroquery(bounds[0], bounds[1]) && !this.microquery(bounds[0], bounds[1])){
 					this.macroESRepr.deleteEdge(bounds[0], bounds[1]);
-					console.log('same2');
 					this.addESQueue();
 				}
 			}
