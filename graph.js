@@ -144,6 +144,7 @@ var Graph = function(container, nodes_param, edges_param) {
 
 	this.unhighlightES = function(esgraph) {
 		items = esgraph.nodes.get();
+		console.log(items)
 		for (var i in items) {
 			this.nodes.update({
 				id: items[i].id,
@@ -188,7 +189,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	}
 
 	this.updateMacroBit = function(id, bitstring) {
-		var arr = this.nodes.get(id).split(", ");
+		var arr = this.nodes.get(id).label.split(", ");
 		var label = arr[0] 
 		if (arr.length == 3) label += ', ' + arr[1];
 		label += ', ' + bitstring;
@@ -235,7 +236,18 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.getVertices = function() {
-		return this.nodes.get()
+		return this.nodes.get();
+	};
+
+	this.getNodeIds = function() {
+		var vertices = [];
+		var allNodes = this.nodes.get();
+		console.log('allnodes')
+		console.log(allNodes)
+		for (var n in allNodes) {
+			vertices.push[allNodes[n].id];
+		}
+		return vertices;
 	};
 
 	this.updateNode = function(id, label) {
@@ -395,8 +407,8 @@ var Graph = function(container, nodes_param, edges_param) {
 			}
 
 		var esgroups = {
-			'1': '#FFC0CB',
-			'2': '#E0FFFF',
+			'1': '#FFB6C1',
+			'2': '#B0E2FF',
 			'3': '#FFBBFF',
 			'4': '#F0FFF0',
 			'5': '#FFFACD'
