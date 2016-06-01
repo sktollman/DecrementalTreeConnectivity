@@ -27,14 +27,25 @@ function defaultGraph() {
 			{id: '2', label: '2'},
 			{id: '3', label: '3'},
 			{id: '4', label: '4'},
-			{id: '5', label: '5'}
+			{id: '5', label: '5'},
+			{id: '6', label: '6'},
+			{id: '7', label: '7'},
+			{id: '8', label: '8'},
+			{id: '9', label: '9'},
+			{id: '10', label: '10'}
 			];
 	var edges = [
 				{id: '1', from: '1', to: '2'},
 				{id: '2', from: '1', to: '3'},
 				{id: '3', from: '1', to: '4'},
-				{id: '4', from: '1', to: '5'}
+				{id: '4', from: '2', to: '5'},
+				{id: '5', from: '5', to: '6'},
+				{id: '6', from: '5', to: '7'},
+				{id: '7', from: '4', to: '8'},
+				{id: '8', from: '4', to: '9'},
+				{id: '9', from: '9', to: '10'}
 				];
+
 
 	createAllGraphs(nodes, edges);	
 }
