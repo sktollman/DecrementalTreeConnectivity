@@ -37,6 +37,7 @@ function reset() {
 	document.getElementById("clear").disabled=true; 
 	document.getElementById("default-graph").disabled=false;
 	document.getElementById("random-graph").disabled=false;
+	document.getElementById("add-node").disabled=false;
 
 	
 	if (sn != undefined) {
