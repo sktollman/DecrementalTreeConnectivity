@@ -70,25 +70,40 @@ var AlstrupSecherSpork = function(graph) {
 		for (var i in verts) {
 			var node = verts[i].id;
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#e60000', '#990000']}); // red
-			var nbors = this.graph.getNeighbors(node);
+			var nbors = this.graph.getNeighbors(node).slice();
 			var deg = nbors.length;
 		  	if(deg <= 3) {
 		  		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
 		  		continue;
 		  	}
-		    this.graph.removeNode(node); //I assume this removes edges incident to node as well
-		    var prevV = null;
+		  	//remove node and incident edges
+		    this.graph.removeNode(node);
 		    for(var j in nbors){
 		    	var nbor = nbors[j];
+		    	this.graph.removeEdge(node, nbor);
+		    }
+		    //make new nodes
+		    var prevV = this.graph.nextNodeId();
+		    this.graph.addNode(prevV, node);
+			  this.graph.addEdge(this.graph.nextEdgeId(), prevV, nbors[0]);
+			  this.graph.addEdge(this.graph.nextEdgeId(), prevV, nbors[1]);
+		    for(var j in nbors){
+		    	if(j <= 1 || j >= deg - 2) continue;
+		    	var nbor = nbors[j];
 		    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
-		    	//var currV = new Vertex(); //I know this is wrong sorry but Idk how it works
-			    this.graph.addNode(nbor, nbor);
-			    if (prevV != null) {
-			    	this.graph.addEdge(currV, prevV);
+			    var currV = this.graph.nextNodeId();
+			    this.graph.addNode(currV, node);
+			    if (prevV != -1) {
+			    	this.graph.addEdge(this.graph.nextEdgeId(), currV, prevV);
 			    }
-			    this.graph.addEdge(currV, nbor);
+			    this.graph.addEdge(this.graph.nextEdgeId(), currV, nbor);
 			    prevV = currV;
 		    }
+		    var currV = this.graph.nextNodeId();
+		    this.graph.addNode(currV, node);
+			  this.graph.addEdge(this.graph.nextEdgeId(), currV, prevV);
+			  this.graph.addEdge(this.graph.nextEdgeId(), currV, nbors[deg-2]);
+			  this.graph.addEdge(this.graph.nextEdgeId(), currV, nbors[deg-1]);
 		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
 		}
 
@@ -247,8 +262,11 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(1)
 	this.query = function(vert1, vert2) {
+    vert1 = this.graph.getNodesWithLabel(vert1)[0];
+    vert2 = this.graph.getNodesWithLabel(vert2)[0];
+
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
-        this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
+    this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
 		// 
 
 		var clu1 = this.clusterMap[vert1];
@@ -304,14 +322,29 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(1)
 	this.deleteEdge = function(vert1, vert2) {
+
+    var vert1s = this.graph.getNodesWithLabel(vert1);
+    outer: for(var p in vert1s){
+    	var p_vert1 = vert1s[p];
+    	var nbors = this.graph.getNeighbors(p_vert1);
+      for(var n in nbors){
+      	var nbor = nbors[n];
+        if(this.graph.getLabelFromId(nbor) === vert2){
+        	vert1 = p_vert1;
+        	vert2 = nbor;
+        	break outer;
+				}
+      }
+    }
+
 		// first remove. 
 		// use queue from macro es to color dfs over boundaries 
 		// print bit representations. 
 		// change bit representation
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
 		this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
-        this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
-        this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
+    this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
+    this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
 		//if it's a macroedge, delete it in the macrograph
 		var outerVerts = this.macroGraph.getVertices();

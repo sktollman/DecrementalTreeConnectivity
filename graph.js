@@ -68,6 +68,31 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.neighbors[id] = new Array();
 	};
 
+	this.getNodesWithLabel = function(label){
+		var res = [];
+		var nodes = this.getVertices();
+		for(var n in nodes){
+			var node = nodes[n];
+			if('label' in node){
+				if(node.label.split(', ')[0] === label){
+					res.push(node.id);
+				}
+			}
+		}
+		return res;
+	};
+
+	this.getLabelFromId = function(id){
+		var nodes = this.getVertices();
+		for(var n in nodes){
+			var node = nodes[n];
+			if(node.id === id){
+				return node.label.split(', ')[0];
+			} 
+		}
+		return null;
+	};
+
 	this.updateNodeGroup = function(id, groupNum) {
 		this.nodes.update({
 			id: id, 

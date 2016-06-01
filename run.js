@@ -22,8 +22,8 @@ function defaultGraph() {
 	var edges = [
 				{id: '1', from: '1', to: '2'},
 				{id: '2', from: '1', to: '3'},
-				{id: '3', from: '2', to: '4'},
-				{id: '4', from: '2', to: '5'}
+				{id: '3', from: '1', to: '4'},
+				{id: '4', from: '1', to: '5'}
 				];
 
 	createAllGraphs(nodes, edges);	

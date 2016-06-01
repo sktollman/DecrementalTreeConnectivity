@@ -1,5 +1,9 @@
+button {
+	padding: 5px;
+}
+
 input {
-	width: 50px;
+	width: 80px;
 }
 
 .title {
@@ -46,7 +50,7 @@ input {
 }
 
 .control-button {
-	padding: 5px;
+	width: 80px;
 }
 
 .result {

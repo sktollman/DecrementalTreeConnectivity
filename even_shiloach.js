@@ -50,9 +50,9 @@ var EvenShiloach = function(graph) {
 	//O(log(n))
 	this.deleteEdge = function(vert1, vert2) {
 		this.animationQueue = []
-        this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
-        this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
-        this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
+    this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+    this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
+    this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
 		var oldCluNum = this.connectivityMap[vert1];
 		//save the list of the two components
