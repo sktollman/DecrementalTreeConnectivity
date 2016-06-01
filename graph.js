@@ -355,8 +355,9 @@ var Graph = function(container, nodes_param, edges_param) {
 				color: {
 					inherit: false
 				}
-			// },
-			// layout: {
+			},
+			layout: {
+				randomSeed: 2
 			// 	hierarchical: {
 			// 		enabled: true,
 			// 		direction: 'UD',
