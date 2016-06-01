@@ -9,6 +9,16 @@ var es;
 var spork;
 var nodesWithoutEdges;
 
+var usingsn;
+var usingnaive;
+var usinges;
+var usingspork;
+
+document.getElementById("sn-checkbox").checked=true;
+document.getElementById("naive-checkbox").checked=true;
+document.getElementById("es-checkbox").checked=true;
+document.getElementById("spork-checkbox").checked=true;
+
 reset();
 
 function defaultGraph() {
@@ -39,6 +49,11 @@ function reset() {
 	document.getElementById("random-graph").disabled=false;
 	document.getElementById("add-node").disabled=false;
 
+	document.getElementById("sn-checkbox").disabled=false;
+	document.getElementById("naive-checkbox").disabled=false;
+	document.getElementById("es-checkbox").disabled=false;
+	document.getElementById("spork-checkbox").disabled=false;
+
 	
 	if (sn != undefined) {
 		sn.graph.clearGraph();
@@ -55,24 +70,30 @@ function reset() {
 }
 
 function createAllGraphs(nodes, edges) { 
+	usingsn = document.getElementById("sn-checkbox").checked;
+	usingnaive = document.getElementById("naive-checkbox").checked;
+	usinges = document.getElementById("es-checkbox").checked;
+	usingspork = document.getElementById("spork-checkbox").checked;
+
+
 	var container1 = document.getElementById('network_supernaive');
 	var g_supernaive = new Graph(container1, nodes, edges);
-	g_supernaive.draw();
+	if (usingsn) g_supernaive.draw();
 	sn = new SuperNaive(g_supernaive);
 
 	var container2 = document.getElementById('network_naive');
 	var g_naive = new Graph(container2, nodes, edges);
-	g_naive.draw();
+	if (usingnaive) g_naive.draw();
 	naive = new Naive(g_naive);
 
 	var container4 = document.getElementById('network_es');
 	var g_es = new Graph(container4, nodes, edges);
-	g_es.draw();
+	if (usinges) g_es.draw();
 	es = new EvenShiloach(g_es);
 
 	var container3 = document.getElementById('network_spork');
 	var g_spork = new Graph(container3, nodes, edges);
-	g_spork.draw();
+	if (usingspork) g_spork.draw();
 	spork = new AlstrupSecherSpork(g_spork);
 
 	// disable random and default buttons, enable edge add and preprocess.
@@ -82,6 +103,12 @@ function createAllGraphs(nodes, edges) {
 	document.getElementById("add-edge").disabled=false;
 	document.getElementById("default-graph").disabled=true;
 	document.getElementById("random-graph").disabled=true;
+
+	// disable checkboxes
+	document.getElementById("sn-checkbox").disabled=true;
+	document.getElementById("naive-checkbox").disabled=true;
+	document.getElementById("es-checkbox").disabled=true;
+	document.getElementById("spork-checkbox").disabled=true;
 }
 
 
@@ -248,31 +275,33 @@ function deleteEdge() {
 }
 
 function highlight() {
-	if (sn.animationQueue.length == 0 && naive.animationQueue.length == 0 && spork.animationQueue.length == 0 && es.animationQueue.length == 0) {
+	if ((!usingsn || sn.animationQueue.length == 0) &&  (!usingnaive || naive.animationQueue.length == 0) 
+		&& (!usingspork || spork.animationQueue.length == 0) && (!usinges || es.animationQueue.length == 0)) {
 		document.getElementById("query").disabled=false;
 		document.getElementById("remove").disabled=false;
 		document.getElementById("clear").disabled=false;
 		return;
 	}
 	
-	if (sn.animationQueue.length > 0) {
-		var action = sn.animationQueue[0]
+	if (usingsn && sn.animationQueue.length > 0) {
+		var action = sn.animationQueue[0];
 		action.func.apply(action.that, action.args)
 		sn.animationQueue.splice(0,1)
 	}
-	if (naive.animationQueue.length > 0) {
+	if (usingnaive && naive.animationQueue.length > 0) {
 		var action = naive.animationQueue[0];
 		action.func.apply(action.that, action.args);
 		naive.animationQueue.splice(0,1);
 	}
 	
-	if (spork.animationQueue.length > 0) {
-	    var action = spork.animationQueue[0]
-	    action.func.apply(action.that, action.args)
-	    spork.animationQueue.splice(0,1)
+	if (usingspork && spork.animationQueue.length > 0) {
+	    var action = spork.animationQueue[0];
+	    console.log(action)
+	    action.func.apply(action.that, action.args);
+	    spork.animationQueue.splice(0,1);
 	}
 
-	if (es.animationQueue.length > 0) {
+	if (usinges && es.animationQueue.length > 0) {
 		var action = es.animationQueue[0];
 		action.func.apply(action.that, action.args);
 		es.animationQueue.splice(0,1);

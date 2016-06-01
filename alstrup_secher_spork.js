@@ -286,6 +286,12 @@ var AlstrupSecherSpork = function(graph) {
 		// highlight both nodes
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert1, '#e60000', '#990000']}); // red
 		this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [micVert2, '#e60000', '#990000']}); // red
+		this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [micVert1, '#e60000']});
+		this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [micVert2, '#e60000']});
+		this.animationQueue.push({func: this.graph.updateLabelColor, that: this.graph, args: [cluster.boundaries[0], '#e60000']});
+		this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [micVert1]});
+		this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [micVert2]});
+		this.animationQueue.push({func: this.graph.unhighlightLabel, that: this.graph, args: [cluster.boundaries[0]]});
 		var x = cluster.pathWords[micVert1];
 		var y = cluster.pathWords[micVert2];
 		var r = x ^ y;
@@ -296,11 +302,10 @@ var AlstrupSecherSpork = function(graph) {
 
 	//O(1)
 	this.query = function(vert1, vert2) {
-    vert1 = this.graph.getNodesWithLabel(vert1)[0];
-    vert2 = this.graph.getNodesWithLabel(vert2)[0];
+	    vert1 = this.graph.getNodesWithLabel(vert1)[0];
+	    vert2 = this.graph.getNodesWithLabel(vert2)[0];
 
-		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
-    this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
+    	this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
 		// 
 
 		var clu1 = this.clusterMap[vert1];
@@ -357,28 +362,27 @@ var AlstrupSecherSpork = function(graph) {
 	//O(1)
 	this.deleteEdge = function(vert1, vert2) {
 
-    var vert1s = this.graph.getNodesWithLabel(vert1);
-    outer: for(var p in vert1s){
-    	var p_vert1 = vert1s[p];
-    	var nbors = this.graph.getNeighbors(p_vert1);
-      for(var n in nbors){
-      	var nbor = nbors[n];
-        if(this.graph.getLabelFromId(nbor) === vert2){
-        	vert1 = p_vert1;
-        	vert2 = nbor;
-        	break outer;
-				}
-      }
-    }
+	    var vert1s = this.graph.getNodesWithLabel(vert1);
+	    outer: for(var p in vert1s){
+	    	var p_vert1 = vert1s[p];
+	    	var nbors = this.graph.getNeighbors(p_vert1);
+	      for(var n in nbors){
+	      	var nbor = nbors[n];
+	        if(this.graph.getLabelFromId(nbor) === vert2){
+	        	vert1 = p_vert1;
+	        	vert2 = nbor;
+	        	break outer;
+					}
+	      }
+	    }
 
 		// first remove. 
 		// use queue from macro es to color dfs over boundaries 
 		// print bit representations. 
 		// change bit representation
-		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
 		this.animationQueue.push({func: this.graph.unhighlightES, that: this.graph, args: [this.macroESRepr.graph]});
-    this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
-    this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
+	    this.animationQueue.push({func: this.graph.highlightEdge, that: this.graph, args: [vert1, vert2, '#e60000']});
+	    this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [vert1, vert2]}); 
 
 
 		//if it's a macroedge, delete it in the macrograph
