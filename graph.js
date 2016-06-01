@@ -68,6 +68,19 @@ var Graph = function(container, nodes_param, edges_param) {
 		this.neighbors[id] = new Array();
 	};
 
+	this.addNodeAndColor = function(id, label, backgroundColor, borderColor) {
+		this.nodes.add({
+			id: id,
+			label: label,
+			color: {
+				background: backgroundColor,
+				border: borderColor
+			}
+		});
+		this.neighbors[id] = new Array();
+	};
+
+
 	this.getNodesWithLabel = function(label){
 		var res = [];
 		var nodes = this.getVertices();

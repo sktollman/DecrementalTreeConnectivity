@@ -24,7 +24,7 @@ var AlstrupSecherSpork = function(graph) {
 		//add the cluster to the map
 		this.clusterMap[node] = null;
 		var clus = [node];
-		var neighbors = this.graph.getNeighbors(node);
+		var neighbors = this.currentGraph.getNeighbors(node);
 		var deg = neighbors.length;
 		var sz = 1;
 		for(var n in neighbors){
@@ -71,6 +71,7 @@ var AlstrupSecherSpork = function(graph) {
 	this.preprocess = function() {
 		//remake the graph such that all nodes have degree <= 3
 		var verts = this.graph.getVertices();
+		this.currentGraph = new Graph("", this.graph.nodes.get(), this.graph.edges.get());
 		for (var i in verts) {
 			var node = verts[i].id;
 			this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#e60000', '#990000']}); // red
@@ -81,41 +82,70 @@ var AlstrupSecherSpork = function(graph) {
 		  		continue;
 		  	}
 		  	//remove node and incident edges
-		    this.graph.removeNode(node);
 		    for(var j in nbors){
 		    	var nbor = nbors[j];
-		    	this.graph.removeEdge(node, nbor);
+		    	this.animationQueue.push({func: this.graph.removeEdge, that: this.graph, args: [node, nbor]});
+		    	this.currentGraph.removeEdge(node, nbor);
 		    }
+		    this.animationQueue.push({func: this.graph.removeNode, that: this.graph, args: [node]});
+		    this.currentGraph.removeNode(node);
+
 		    //make new nodes
 		    var prevV = this.graph.nextNodeId();
-		    this.graph.addNode(prevV, node);
-			  this.graph.addEdge(this.graph.nextEdgeId(), prevV, nbors[0]);
-			  this.graph.addEdge(this.graph.nextEdgeId(), prevV, nbors[1]);
+		    var currNodeId = prevV;
+		    
+		    this.currentGraph.addNode(prevV, node);
+		    this.animationQueue.push({func: this.graph.addNodeAndColor, that: this.graph, args: [prevV, node, '#e60000', '#990000']});
+		 	
+		 	var newId = this.graph.nextEdgeId();
+		 	this.currentGraph.addEdge(newId, prevV, nbors[0]);
+		 	this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, prevV, nbors[0]]});
+			
+			newId = this.graph.nextEdgeId();
+			this.currentGraph.addEdge(newId, prevV, nbors[1]);
+			this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, prevV, nbors[1]]});
+		    
+
 		    for(var j in nbors){
 		    	if(j <= 1 || j >= deg - 2) continue;
 		    	var nbor = nbors[j];
 		    	this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [nbor, '#ffff00', '#ffd700']}); // yellow
 			    var currV = this.graph.nextNodeId();
-			    this.graph.addNode(currV, node);
+			    this.currentGraph.addNode(currV, node);
+			    this.animationQueue.push({func: this.graph.addNode, that: this.graph, args: [currV, node]});
 			    if (prevV != -1) {
-			    	this.graph.addEdge(this.graph.nextEdgeId(), currV, prevV);
+			    	var newId = this.graph.nextEdgeId();
+			    	this.currentGraph.addEdge(newId, currV, prevV);
+			    	this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, currV, prevV]});
 			    }
-			    this.graph.addEdge(this.graph.nextEdgeId(), currV, nbor);
+			    var newId = this.graph.nextEdgeId();
+			    this.currentGraph.addEdge(newId, currV, nbor);
+			    this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, currV, nbor]});
 			    prevV = currV;
 		    }
 		    var currV = this.graph.nextNodeId();
-		    this.graph.addNode(currV, node);
-			  this.graph.addEdge(this.graph.nextEdgeId(), currV, prevV);
-			  this.graph.addEdge(this.graph.nextEdgeId(), currV, nbors[deg-2]);
-			  this.graph.addEdge(this.graph.nextEdgeId(), currV, nbors[deg-1]);
-		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [node, '#878787', '#696969']}); // grey
+		    this.animationQueue.push({func: this.graph.addNode, that: this.graph, args: [currV, node]});
+			this.currentGraph.addNode(currV, node);
+			var newId = this.graph.nextEdgeId();
+			this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, currV, prevV]});
+			this.currentGraph.addEdge(newId, currV, prevV);
+			newId = this.graph.nextEdgeId();
+			this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, currV, nbors[deg-2]]});
+			this.currentGraph.addEdge(newId, currV, nbors[deg-2]);
+			newId = this.graph.nextEdgeId();
+			this.animationQueue.push({func: this.graph.addEdge, that: this.graph, args: [newId, currV, nbors[deg-1]]});
+		  	this.currentGraph.addEdge(newId, currV, nbors[deg-1]);
+
+		    this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [currNodeId, '#878787', '#696969']}); // grey
+			
 		}
 
 		this.animationQueue.push({func: this.graph.unhighlightAll, that: this.graph, args: []});
+		
 
 		var rt = null;
 		for (var vert in verts) {
-			if (this.graph.getNeighbors(verts[vert].id).length == 1) {
+			if (this.currentGraph.getNeighbors(verts[vert].id).length == 1) {
 				rt = verts[vert];
 				break;
 			}
@@ -130,7 +160,7 @@ var AlstrupSecherSpork = function(graph) {
 			clus.boundaries = [];
 			for(var n in clus.nodes){
 				var node = clus.nodes[n]
-				var nbors = this.graph.getNeighbors(node)
+				var nbors = this.currentGraph.getNeighbors(node)
 				for(var nbor in nbors){
 					if(this.clusterMap[nbors[nbor]] !== clus){
 						clus.boundaries.push(node);
@@ -152,7 +182,7 @@ var AlstrupSecherSpork = function(graph) {
 			for(var b in clus.boundaries){
 				var bound = clus.boundaries[b]
 				macroNodes.push({id: bound, label: bound});
-				var neighbors = this.graph.getNeighbors(bound)
+				var neighbors = this.currentGraph.getNeighbors(bound)
 				for(var n in neighbors){
 					var nbor = neighbors[n];
 					if(this.clusterMap[nbor] !== clus || nbor in clus.boundaries){
@@ -205,7 +235,7 @@ var AlstrupSecherSpork = function(graph) {
 				var curr = stack.pop();
 				this.animationQueue.push({func: this.graph.highlightNode, that: this.graph, args: [curr, '#e60000', '#990000']}); // red
 				searched[curr] = true;
-				var neighbors = this.graph.getNeighbors(curr)
+				var neighbors = this.currentGraph.getNeighbors(curr)
 				for(var n in neighbors){
 					var nbor = neighbors[n]
 					if(nbor in searched || this.clusterMap[nbor] !== clus) continue;
