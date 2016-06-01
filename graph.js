@@ -355,19 +355,19 @@ var Graph = function(container, nodes_param, edges_param) {
 				color: {
 					inherit: false
 				}
-			},
-			layout: {
-				hierarchical: {
-					enabled: true,
-					direction: 'UD',
-					sortMethod: 'directed',
-					levelSeparation: 70,
-					nodeSpacing: 135,
-					treeSpacing: 135
-				}
-			},
-			physics: {
-				enabled: false
+			// },
+			// layout: {
+			// 	hierarchical: {
+			// 		enabled: true,
+			// 		direction: 'UD',
+			// 		sortMethod: 'directed',
+			// 		levelSeparation: 70,
+			// 		nodeSpacing: 135,
+			// 		treeSpacing: 135
+			// 	}
+			// },
+			// physics: {
+			// 	enabled: false
 			},
 			groups: groups
 		};
