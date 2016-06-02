@@ -1,7 +1,7 @@
 var AlstrupSecherSpork = function(graph) {
 	this.graph = graph;
 	this.numNodes = this.graph.getVertices().length;
-	this.logSize = 3 * Math.log(this.numNodes);
+	this.logSize = Math.log(this.numNodes);
 	this.clusters = [];
 	this.clusterMap = {};
 

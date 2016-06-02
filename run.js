@@ -17,7 +17,7 @@ var usingspork;
 document.getElementById("sn-checkbox").checked=true;
 document.getElementById("naive-checkbox").checked=true;
 document.getElementById("es-checkbox").checked=true;
-document.getElementById("spork-checkbox").checked=true;
+document.getElementById("spork-checkbox").checked=false;
 
 reset();
 

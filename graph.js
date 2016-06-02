@@ -156,6 +156,7 @@ var Graph = function(container, nodes_param, edges_param) {
 	};
 
 	this.unhighlightES = function(esgraph) {
+		this.unhighlightAll();
 		items = esgraph.nodes.get();
 		console.log(items)
 		for (var i in items) {
